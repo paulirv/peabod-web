@@ -20,3 +20,12 @@ bucket_name = "peabod"
 
 [vars]
 ENVIRONMENT = "production"
+
+# Custom domain routes
+[[routes]]
+pattern = "www.peabod.com/*"
+zone_name = "peabod.com"
+
+[[routes]]
+pattern = "peabod.com/*"
+zone_name = "peabod.com"
