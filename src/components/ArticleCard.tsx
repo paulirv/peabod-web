@@ -12,7 +12,10 @@ interface ArticleCardProps {
   author: string;
   authored_on: string;
   body: string;
-  image?: string;
+  media_path?: string;
+  media_alt?: string;
+  media_width?: number;
+  media_height?: number;
   tags?: Tag[];
 }
 
@@ -22,7 +25,10 @@ export default function ArticleCard({
   author,
   authored_on,
   body,
-  image,
+  media_path,
+  media_alt,
+  media_width,
+  media_height,
   tags,
 }: ArticleCardProps) {
   const excerpt = body.length > 200 ? body.substring(0, 200) + "..." : body;
@@ -40,11 +46,13 @@ export default function ArticleCard({
         borderColor: "var(--border)",
       }}
     >
-      {image && (
+      {media_path && (
         <Link href={`/article/${slug}`}>
           <img
-            src={`/api/media/${image}`}
-            alt={title}
+            src={`/api/media/${media_path}`}
+            alt={media_alt || title}
+            width={media_width}
+            height={media_height}
             className="w-full h-48 object-cover"
           />
         </Link>

@@ -16,7 +16,11 @@ interface Article {
   body: string;
   author: string;
   authored_on: string;
-  image?: string;
+  media_id?: number;
+  media_path?: string;
+  media_alt?: string;
+  media_width?: number;
+  media_height?: number;
   updated_at: string;
   tags?: Tag[];
 }
@@ -25,7 +29,13 @@ async function getArticle(slug: string): Promise<Article | null> {
   try {
     const db = getDB();
     const article = await db
-      .prepare("SELECT * FROM articles WHERE slug = ? AND published = 1")
+      .prepare(
+        `SELECT a.*, m.path as media_path, m.alt as media_alt,
+                m.width as media_width, m.height as media_height
+         FROM articles a
+         LEFT JOIN media m ON a.media_id = m.id
+         WHERE a.slug = ? AND a.published = 1`
+      )
       .bind(slug)
       .first<Article>();
 
@@ -119,11 +129,13 @@ export default async function ArticlePage({
         )}
       </header>
 
-      {article.image && (
+      {article.media_path && (
         <figure className="mb-8">
           <img
-            src={`/api/media/${article.image}`}
-            alt={article.title}
+            src={`/api/media/${article.media_path}`}
+            alt={article.media_alt || article.title}
+            width={article.media_width}
+            height={article.media_height}
             className="w-full rounded-lg shadow-md"
           />
         </figure>

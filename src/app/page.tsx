@@ -15,7 +15,11 @@ interface Article {
   body: string;
   author: string;
   authored_on: string;
-  image?: string;
+  media_id?: number;
+  media_path?: string;
+  media_alt?: string;
+  media_width?: number;
+  media_height?: number;
   tags?: Tag[];
 }
 
@@ -24,7 +28,12 @@ async function getArticles(): Promise<Article[]> {
     const db = getDB();
     const { results } = await db
       .prepare(
-        "SELECT * FROM articles WHERE published = 1 ORDER BY authored_on DESC LIMIT 20"
+        `SELECT a.*, m.path as media_path, m.alt as media_alt,
+                m.width as media_width, m.height as media_height
+         FROM articles a
+         LEFT JOIN media m ON a.media_id = m.id
+         WHERE a.published = 1
+         ORDER BY a.authored_on DESC LIMIT 20`
       )
       .all();
 
