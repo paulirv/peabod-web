@@ -1,26 +1,46 @@
+"use client";
+
 import Link from "next/link";
+import ThemeSwitcher from "./ThemeSwitcher";
 
 export default function Header() {
   return (
-    <header className="bg-white border-b border-gray-200">
+    <header
+      className="border-b"
+      style={{
+        backgroundColor: "var(--card)",
+        borderColor: "var(--border)",
+      }}
+    >
       <div className="max-w-4xl mx-auto px-4 py-6">
         <nav className="flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-gray-900">
+          <Link
+            href="/"
+            className="text-2xl font-bold"
+            style={{ color: "var(--foreground)" }}
+          >
             Peabod
           </Link>
-          <div className="flex gap-6">
+          <div className="flex items-center gap-6">
             <Link
               href="/"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
+              className="transition-colors"
+              style={{ color: "var(--muted-foreground)" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--foreground)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted-foreground)")}
             >
               Blog
             </Link>
             <Link
               href="/about"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
+              className="transition-colors"
+              style={{ color: "var(--muted-foreground)" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--foreground)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted-foreground)")}
             >
               About
             </Link>
+            <ThemeSwitcher />
           </div>
         </nav>
       </div>

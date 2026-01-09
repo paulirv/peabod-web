@@ -57,17 +57,22 @@ export default async function Home() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <div className="mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <h1 className="text-4xl font-bold mb-4" style={{ color: "var(--foreground)" }}>
           Welcome to Peabod
         </h1>
-        <p className="text-lg text-gray-600">
+        <p className="text-lg" style={{ color: "var(--muted-foreground)" }}>
           Thoughts, ideas, and stories from my corner of the internet.
         </p>
       </div>
 
       {articles.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <p className="text-gray-500">No articles yet. Check back soon!</p>
+        <div
+          className="text-center py-12 rounded-lg"
+          style={{ backgroundColor: "var(--muted)" }}
+        >
+          <p style={{ color: "var(--muted-foreground)" }}>
+            No articles yet. Check back soon!
+          </p>
         </div>
       ) : (
         <div className="space-y-6">
