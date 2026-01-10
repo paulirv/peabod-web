@@ -324,7 +324,7 @@ function LoginModal({
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 rounded border text-gray-900"
+              className="w-full px-3 py-2 rounded border text-foreground"
               style={{
                 backgroundColor: "var(--background)",
                 borderColor: "var(--border)",
@@ -344,7 +344,7 @@ function LoginModal({
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 rounded border text-gray-900"
+              className="w-full px-3 py-2 rounded border text-foreground"
               style={{
                 backgroundColor: "var(--background)",
                 borderColor: "var(--border)",
@@ -471,7 +471,7 @@ function RegisterModal({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 rounded border text-gray-900"
+              className="w-full px-3 py-2 rounded border text-foreground"
               style={{
                 backgroundColor: "var(--background)",
                 borderColor: "var(--border)",
@@ -491,7 +491,7 @@ function RegisterModal({
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 rounded border text-gray-900"
+              className="w-full px-3 py-2 rounded border text-foreground"
               style={{
                 backgroundColor: "var(--background)",
                 borderColor: "var(--border)",
@@ -511,7 +511,7 @@ function RegisterModal({
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 rounded border text-gray-900"
+              className="w-full px-3 py-2 rounded border text-foreground"
               style={{
                 backgroundColor: "var(--background)",
                 borderColor: "var(--border)",

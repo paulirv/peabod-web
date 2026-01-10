@@ -151,7 +151,7 @@ export default function AccountPage() {
             type="email"
             value={user.email}
             disabled
-            className="w-full px-4 py-2 rounded border text-gray-500"
+            className="w-full px-4 py-2 rounded border text-muted-foreground"
             style={{
               backgroundColor: "var(--muted)",
               borderColor: "var(--border)",
@@ -176,7 +176,7 @@ export default function AccountPage() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-4 py-2 rounded border text-gray-900"
+            className="w-full px-4 py-2 rounded border text-foreground"
             style={{
               backgroundColor: "var(--background)",
               borderColor: "var(--border)",
@@ -197,7 +197,7 @@ export default function AccountPage() {
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             rows={4}
-            className="w-full px-4 py-2 rounded border text-gray-900"
+            className="w-full px-4 py-2 rounded border text-foreground"
             style={{
               backgroundColor: "var(--background)",
               borderColor: "var(--border)",
