@@ -1,5 +1,8 @@
 # Peabod Web
 
+[![CI](https://github.com/paulirv/peabod-web/actions/workflows/ci.yml/badge.svg)](https://github.com/paulirv/peabod-web/actions/workflows/ci.yml)
+[![E2E Tests](https://github.com/paulirv/peabod-web/actions/workflows/e2e.yml/badge.svg)](https://github.com/paulirv/peabod-web/actions/workflows/e2e.yml)
+
 Next.js application for [peabod.com](https://peabod.com) - a personal blog and CMS deployed to Cloudflare Workers.
 
 ## Tech Stack
@@ -55,6 +58,26 @@ Or run migrations incrementally:
 wrangler d1 execute peabod-db --file=./migrations/001_add_media_table.sql
 wrangler d1 execute peabod-db --file=./migrations/002_add_users_sessions.sql
 wrangler d1 execute peabod-db --file=./migrations/003_add_user_roles.sql
+```
+
+### Testing
+
+Run unit tests:
+
+```bash
+npm test              # Run tests once
+npm run test:watch    # Watch mode
+npm run test:coverage # With coverage report
+npm run test:ui       # Visual UI mode
+```
+
+Run E2E tests:
+
+```bash
+npm run test:e2e         # Headless
+npm run test:e2e:headed  # With browser visible
+npm run test:e2e:ui      # Interactive UI mode
+npm run test:e2e:report  # View test report
 ```
 
 ### Deployment
