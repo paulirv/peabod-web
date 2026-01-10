@@ -31,8 +31,8 @@ export default function ArticleCard({
   body,
   media_path,
   media_alt,
-  _media_width,
-  _media_height,
+  media_width: _media_width,
+  media_height: _media_height,
   tags,
   isAdmin,
 }: ArticleCardProps) {
