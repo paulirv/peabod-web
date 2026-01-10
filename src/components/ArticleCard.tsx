@@ -7,6 +7,7 @@ interface Tag {
 }
 
 interface ArticleCardProps {
+  id: number;
   slug: string;
   title: string;
   author: string;
@@ -17,9 +18,11 @@ interface ArticleCardProps {
   media_width?: number;
   media_height?: number;
   tags?: Tag[];
+  isAdmin?: boolean;
 }
 
 export default function ArticleCard({
+  id,
   slug,
   title,
   author,
@@ -30,6 +33,7 @@ export default function ArticleCard({
   media_width,
   media_height,
   tags,
+  isAdmin,
 }: ArticleCardProps) {
   const excerpt = body.length > 200 ? body.substring(0, 200) + "..." : body;
   const formattedDate = new Date(authored_on).toLocaleDateString("en-US", {
@@ -93,13 +97,27 @@ export default function ArticleCard({
         <p style={{ color: "var(--muted-foreground)" }} className="leading-relaxed">
           {excerpt}
         </p>
-        <Link
-          href={`/article/${slug}`}
-          className="inline-block mt-4 text-sm font-medium"
-          style={{ color: "var(--primary)" }}
-        >
-          Read more &rarr;
-        </Link>
+        <div className="flex items-center gap-4 mt-4">
+          <Link
+            href={`/article/${slug}`}
+            className="text-sm font-medium"
+            style={{ color: "var(--primary)" }}
+          >
+            Read more &rarr;
+          </Link>
+          {isAdmin && (
+            <a
+              href={`https://cms.peabod.com/articles/${id}/edit`}
+              className="text-sm font-medium px-3 py-1 rounded-full"
+              style={{
+                backgroundColor: "var(--secondary)",
+                color: "var(--secondary-foreground)",
+              }}
+            >
+              Edit
+            </a>
+          )}
+        </div>
       </div>
     </article>
   );

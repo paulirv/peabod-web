@@ -1,4 +1,5 @@
 import { getDB } from "@/lib/db";
+import { isAdmin } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
@@ -82,7 +83,7 @@ export default async function ArticlePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const article = await getArticle(slug);
+  const [article, admin] = await Promise.all([getArticle(slug), isAdmin()]);
 
   if (!article) {
     notFound();
@@ -99,12 +100,22 @@ export default async function ArticlePage({
 
   return (
     <article className="max-w-3xl mx-auto px-4 py-12">
-      <Link
-        href="/"
-        className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-8"
-      >
-        &larr; Back to all articles
-      </Link>
+      <div className="flex items-center justify-between mb-8">
+        <Link
+          href="/"
+          className="inline-flex items-center text-blue-600 hover:text-blue-800"
+        >
+          &larr; Back to all articles
+        </Link>
+        {admin && (
+          <a
+            href={`https://cms.peabod.com/articles/${article.id}/edit`}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+          >
+            Edit Article
+          </a>
+        )}
+      </div>
 
       <header className="mb-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">

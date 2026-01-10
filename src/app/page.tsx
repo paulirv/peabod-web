@@ -1,4 +1,5 @@
 import { getDB } from "@/lib/db";
+import { isAdmin } from "@/lib/auth";
 import ArticleCard from "@/components/ArticleCard";
 
 
@@ -61,7 +62,7 @@ async function getArticles(): Promise<Article[]> {
 }
 
 export default async function Home() {
-  const articles = await getArticles();
+  const [articles, admin] = await Promise.all([getArticles(), isAdmin()]);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
@@ -86,7 +87,7 @@ export default async function Home() {
       ) : (
         <div className="space-y-6">
           {articles.map((article) => (
-            <ArticleCard key={article.id} {...article} />
+            <ArticleCard key={article.id} {...article} isAdmin={admin} />
           ))}
         </div>
       )}
