@@ -83,7 +83,7 @@ export async function generateMetadata({
         width: 1200,
         height: 630,
         fit: "cover",
-        quality: 80,
+        quality: 70,
       })
     : undefined;
 

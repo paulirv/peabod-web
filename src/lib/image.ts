@@ -29,7 +29,7 @@ export function getImageUrl(
     width,
     height,
     fit = 'cover',
-    quality = 80,
+    quality = 70,
     format = 'auto',
     dpr,
   } = options;
@@ -86,18 +86,19 @@ export function generateSrcSet(
 
 /**
  * Common image size presets for different use cases
+ * Optimized for file size while maintaining visual quality
  */
 export const IMAGE_PRESETS = {
-  // Article card thumbnail
+  // Article card thumbnail - max 640px is plenty for card images
   card: {
     widths: [320, 480, 640],
     sizes: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
     aspectRatio: '16/9',
   },
-  // Article hero image
+  // Article hero image - capped at 1280px (sufficient for most displays)
   hero: {
-    widths: [640, 960, 1280, 1920],
-    sizes: '100vw',
+    widths: [480, 768, 1024, 1280],
+    sizes: '(max-width: 768px) 100vw, 768px',
     aspectRatio: '16/9',
   },
   // Media library thumbnail
@@ -108,7 +109,7 @@ export const IMAGE_PRESETS = {
   },
   // Media preview in editor
   mediaPreview: {
-    widths: [320, 640],
+    widths: [320, 480],
     sizes: '320px',
     aspectRatio: 'auto',
   },
