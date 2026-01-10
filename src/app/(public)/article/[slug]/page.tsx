@@ -3,6 +3,8 @@ import { getSessionUser } from "@/lib/session";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ResponsiveImageContainer } from "@/components/ResponsiveImage";
+import { getImageUrl } from "@/lib/image";
+import type { Metadata } from "next";
 
 
 interface Tag {
@@ -64,7 +66,7 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await params;
   const article = await getArticle(slug);
 
@@ -72,9 +74,48 @@ export async function generateMetadata({
     return { title: "Article Not Found" };
   }
 
+  const description = article.body.substring(0, 160).trim() + "...";
+  const url = `https://peabod.com/article/${slug}`;
+
+  // Generate OG image URL (1200x630 is the standard for social sharing)
+  const ogImage = article.media_path
+    ? getImageUrl(article.media_path, {
+        width: 1200,
+        height: 630,
+        fit: "cover",
+        quality: 80,
+      })
+    : undefined;
+
   return {
-    title: `${article.title} | Peabod`,
-    description: article.body.substring(0, 160),
+    title: article.title,
+    description,
+    openGraph: {
+      type: "article",
+      title: article.title,
+      description,
+      url,
+      siteName: "Peabod",
+      publishedTime: article.authored_on,
+      modifiedTime: article.updated_at,
+      authors: [article.author],
+      ...(ogImage && {
+        images: [
+          {
+            url: ogImage,
+            width: 1200,
+            height: 630,
+            alt: article.media_alt || article.title,
+          },
+        ],
+      }),
+    },
+    twitter: {
+      card: ogImage ? "summary_large_image" : "summary",
+      title: article.title,
+      description,
+      ...(ogImage && { images: [ogImage] }),
+    },
   };
 }
 

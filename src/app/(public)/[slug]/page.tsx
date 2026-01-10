@@ -2,6 +2,7 @@ import { getDB } from "@/lib/db";
 import { getSessionUser } from "@/lib/session";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
 
 interface Page {
   id: number;
@@ -31,7 +32,7 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await params;
   const page = await getPage(slug);
 
@@ -39,9 +40,24 @@ export async function generateMetadata({
     return { title: "Page Not Found" };
   }
 
+  const description = page.body.substring(0, 160).trim() + "...";
+  const url = `https://peabod.com/${slug}`;
+
   return {
-    title: `${page.title} | Peabod`,
-    description: page.body.substring(0, 160),
+    title: page.title,
+    description,
+    openGraph: {
+      type: "website",
+      title: page.title,
+      description,
+      url,
+      siteName: "Peabod",
+    },
+    twitter: {
+      card: "summary",
+      title: page.title,
+      description,
+    },
   };
 }
 

@@ -13,8 +13,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Peabod",
-  description: "Personal blog and website",
+  title: {
+    default: "Peabod",
+    template: "%s | Peabod",
+  },
+  description: "Thoughts, ideas, and stories from my corner of the internet.",
+  metadataBase: new URL("https://peabod.com"),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://peabod.com",
+    siteName: "Peabod",
+    title: "Peabod",
+    description: "Thoughts, ideas, and stories from my corner of the internet.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Peabod",
+    description: "Thoughts, ideas, and stories from my corner of the internet.",
+  },
 };
 
 export default function RootLayout({
