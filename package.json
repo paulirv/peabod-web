@@ -1,7 +1,13 @@
 {
-  "name": "frontend",
+  "name": "peabod-web",
   "version": "0.1.0",
   "private": true,
+  "browserslist": [
+    "Chrome >= 92",
+    "Firefox >= 91",
+    "Safari >= 15",
+    "Edge >= 92"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",

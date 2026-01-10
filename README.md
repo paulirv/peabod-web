@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Peabod Web
+
+Next.js application for [peabod.com](https://peabod.com) - a personal blog and CMS deployed to Cloudflare Workers.
+
+## Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Deployment**: Cloudflare Workers via OpenNext
+- **Database**: Cloudflare D1 (SQLite)
+- **Storage**: Cloudflare R2 (media/images)
+- **Styling**: Tailwind CSS 4
+
+## Features
+
+### Public Site
+- Blog articles with tags
+- Static pages
+- User registration and authentication
+- User profiles
+- Multi-theme support
+
+### Admin Dashboard (`/admin`)
+- Article management (create, edit, publish)
+- Page management
+- Tag management
+- Media library with EXIF extraction
+- User management with role-based access (admin, editor, author)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 20+
+- Cloudflare account with D1 and R2 configured
+
+### Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Database Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Apply the schema to your D1 database:
 
-## Learn More
+```bash
+wrangler d1 execute peabod-db --file=./schema.sql
+```
 
-To learn more about Next.js, take a look at the following resources:
+Or run migrations incrementally:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+wrangler d1 execute peabod-db --file=./migrations/001_add_media_table.sql
+wrangler d1 execute peabod-db --file=./migrations/002_add_users_sessions.sql
+wrangler d1 execute peabod-db --file=./migrations/003_add_user_roles.sql
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Deployment
 
-## Deploy on Vercel
+Build and deploy to Cloudflare Workers:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npx @opennextjs/cloudflare build
+npx wrangler deploy
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── (public)/          # Public routes (home, articles, pages)
+│   ├── admin/             # Admin dashboard
+│   │   ├── (dashboard)/   # Authenticated admin pages
+│   │   ├── api/           # Admin API routes
+│   │   └── login/         # Admin login page
+│   └── api/               # Public API routes (auth, media)
+├── components/
+│   ├── admin/             # Admin UI components
+│   └── ...                # Shared components
+├── lib/                   # Utilities (auth, db, session)
+└── types/                 # TypeScript types
+```
+
+## Environment
+
+Configured via `wrangler.toml`:
+- `DB` - D1 database binding
+- `MEDIA` - R2 bucket binding
+- `ENVIRONMENT` - production/development
+
+## Authentication
+
+Two auth mechanisms:
+1. **Session-based** - Cookie authentication for admin access
+2. **Cloudflare Zero Trust** - Optional enterprise SSO (when enabled)
+
+## License
+
+Private
