@@ -361,9 +361,7 @@ describe('/admin/api/articles', () => {
           run: vi.fn().mockResolvedValue({ success: true }),
         }));
 
-        let callCount = 0;
         mockDB.prepare.mockImplementation((sql: string) => {
-          callCount++;
           if (sql.includes('INSERT INTO articles')) {
             return {
               bind: vi.fn(() => ({

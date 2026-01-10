@@ -12,7 +12,6 @@ test.describe('Article Browsing', () => {
     if (count > 0) {
       // Click the first article
       const firstArticle = articleLinks.first();
-      const href = await firstArticle.getAttribute('href');
 
       await firstArticle.click();
       await page.waitForLoadState('networkidle');

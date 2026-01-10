@@ -14,10 +14,8 @@ test.describe('User Registration', () => {
 
       // Check for registration form elements
       const emailInput = page.locator('input[type="email"], input[name="email"]');
-      const passwordInput = page.locator('input[type="password"]');
-      const nameInput = page.locator('input[name="name"], input[placeholder*="name" i]');
 
-      // At least email and password should be present
+      // At least email should be present
       if (await emailInput.count() > 0) {
         await expect(emailInput.first()).toBeVisible();
       }
@@ -122,8 +120,6 @@ test.describe('Admin Login', () => {
 
     // Admin login page should have login form
     const loginForm = page.locator('form');
-    const emailInput = page.locator('input[type="email"], input[name="email"]');
-    const passwordInput = page.locator('input[type="password"]');
 
     // Check if we're on a login page or redirected
     const isLoginPage = page.url().includes('login');

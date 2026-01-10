@@ -28,7 +28,7 @@ export function createMockD1(): D1Database {
   const mockResults: Map<string, unknown[]> = new Map();
 
   const prepare = vi.fn((sql: string) => ({
-    bind: vi.fn((...params: unknown[]) => ({
+    bind: vi.fn((..._params: unknown[]) => ({
       first: vi.fn(async () => {
         const results = mockResults.get(sql);
         return results?.[0] ?? null;
