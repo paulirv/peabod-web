@@ -1,5 +1,6 @@
 main = ".open-next/worker.js"
 name = "peabod-web"
+account_id = "bb4c9b919e317b42c003591ab2cc4ecd"  # Paul@iwpi.com's Account
 compatibility_date = "2025-03-25"
 compatibility_flags = ["nodejs_compat"]
 
