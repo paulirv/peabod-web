@@ -48,9 +48,12 @@ export default function ResponsiveImage({
   // Generate srcset for WebP (modern browsers)
   const webpSrcSet = generateSrcSet(path, [...widths], { format: 'auto' });
 
-  // Fallback URL (largest size)
+  // Fallback URL - use middle size for reasonable default
+  // The srcset will provide the optimal size for most browsers
+  const sortedWidths = [...widths].sort((a, b) => a - b);
+  const fallbackWidth = sortedWidths[Math.floor(sortedWidths.length / 2)] || sortedWidths[0];
   const fallbackUrl = getImageUrl(path, {
-    width: Math.max(...widths),
+    width: fallbackWidth,
     format: 'auto',
   });
 
@@ -68,7 +71,7 @@ export default function ResponsiveImage({
         alt={alt}
         loading={priority ? 'eager' : loading}
         fetchPriority={priority ? 'high' : undefined}
-        decoding="async"
+        decoding={priority ? 'sync' : 'async'}
         className={className}
         style={{
           width: '100%',

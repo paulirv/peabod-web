@@ -86,8 +86,13 @@ export default async function Home() {
         </div>
       ) : (
         <div className="space-y-6">
-          {articles.map((article) => (
-            <ArticleCard key={article.id} {...article} isAdmin={admin} />
+          {articles.map((article, index) => (
+            <ArticleCard
+              key={article.id}
+              {...article}
+              isAdmin={admin}
+              priority={index === 0}
+            />
           ))}
         </div>
       )}

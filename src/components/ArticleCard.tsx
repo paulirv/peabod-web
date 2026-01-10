@@ -20,6 +20,8 @@ interface ArticleCardProps {
   media_height?: number;
   tags?: Tag[];
   isAdmin?: boolean;
+  /** Set to true for above-the-fold images (LCP optimization) */
+  priority?: boolean;
 }
 
 export default function ArticleCard({
@@ -33,6 +35,7 @@ export default function ArticleCard({
   media_alt,
   tags,
   isAdmin,
+  priority = false,
 }: ArticleCardProps) {
   const excerpt = body.length > 200 ? body.substring(0, 200) + "..." : body;
   const formattedDate = new Date(authored_on).toLocaleDateString("en-US", {
@@ -57,6 +60,7 @@ export default function ArticleCard({
             preset="card"
             aspectRatio="auto"
             containerClassName="h-48 w-full"
+            priority={priority}
           />
         </Link>
       )}
