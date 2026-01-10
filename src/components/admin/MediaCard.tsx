@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { Media } from "@/types/media";
 
 interface MediaCardProps {
@@ -51,11 +52,13 @@ export default function MediaCard({
             </svg>
           </div>
         ) : (
-          <img
+          <Image
             src={`/api/media/${media.path}`}
             alt={media.alt || media.title}
-            className="w-full h-full object-cover"
-            loading="lazy"
+            fill
+            sizes="(max-width: 768px) 50vw, 200px"
+            className="object-cover"
+            unoptimized
           />
         )}
 

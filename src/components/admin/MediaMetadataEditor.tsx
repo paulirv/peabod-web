@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import type { Media } from "@/types/media";
 
 interface MediaMetadataEditorProps {
@@ -275,10 +276,13 @@ export default function MediaMetadataEditor({
               </svg>
             </div>
           ) : (
-            <img
+            <Image
               src={`/api/media/${media?.path}`}
-              alt={media?.alt || media?.title}
-              className="w-full h-full object-cover"
+              alt={media?.alt || media?.title || "Media preview"}
+              fill
+              sizes="80px"
+              className="object-cover"
+              unoptimized
             />
           )}
         </div>

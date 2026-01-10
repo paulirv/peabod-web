@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import MediaCard from "@/components/admin/MediaCard";
 import type { Media, MediaWithUsage, MediaUsageDetails } from "@/types/media";
 
@@ -435,7 +436,7 @@ export default function MediaLibraryPage() {
               {sortedMedia.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
-                    <div className="w-16 h-12 bg-gray-100 rounded overflow-hidden">
+                    <div className="w-16 h-12 bg-gray-100 rounded overflow-hidden relative">
                       {item.type === "video" ? (
                         <div className="w-full h-full flex items-center justify-center bg-gray-800">
                           <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -443,10 +444,13 @@ export default function MediaLibraryPage() {
                           </svg>
                         </div>
                       ) : (
-                        <img
+                        <Image
                           src={`/admin/api/media/${item.path}`}
                           alt={item.alt || item.title}
-                          className="w-full h-full object-cover"
+                          fill
+                          sizes="64px"
+                          className="object-cover"
+                          unoptimized
                         />
                       )}
                     </div>
@@ -695,7 +699,7 @@ function EditMediaForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+      <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden relative">
         {media.type === "video" ? (
           <div className="w-full h-full flex items-center justify-center bg-gray-800">
             <svg className="w-16 h-16 text-white opacity-75" fill="currentColor" viewBox="0 0 24 24">
@@ -703,10 +707,13 @@ function EditMediaForm({
             </svg>
           </div>
         ) : (
-          <img
+          <Image
             src={`/admin/api/media/${media.path}`}
             alt={media.alt || media.title}
-            className="w-full h-full object-contain"
+            fill
+            sizes="(max-width: 768px) 100vw, 500px"
+            className="object-contain"
+            unoptimized
           />
         )}
       </div>

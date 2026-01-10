@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 interface Tag {
   id: number;
@@ -30,8 +31,8 @@ export default function ArticleCard({
   body,
   media_path,
   media_alt,
-  media_width,
-  media_height,
+  _media_width,
+  _media_height,
   tags,
   isAdmin,
 }: ArticleCardProps) {
@@ -51,13 +52,14 @@ export default function ArticleCard({
       }}
     >
       {media_path && (
-        <Link href={`/article/${slug}`}>
-          <img
+        <Link href={`/article/${slug}`} className="block relative h-48">
+          <Image
             src={`/api/media/${media_path}`}
             alt={media_alt || title}
-            width={media_width}
-            height={media_height}
-            className="w-full h-48 object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover"
+            unoptimized
           />
         </Link>
       )}

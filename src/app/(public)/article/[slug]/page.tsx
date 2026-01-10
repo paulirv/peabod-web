@@ -2,6 +2,7 @@ import { getDB } from "@/lib/db";
 import { getSessionUser } from "@/lib/session";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 
 interface Tag {
@@ -143,13 +144,15 @@ export default async function ArticlePage({
       </header>
 
       {article.media_path && (
-        <figure className="mb-8">
-          <img
+        <figure className="mb-8 relative aspect-video">
+          <Image
             src={`/api/media/${article.media_path}`}
             alt={article.media_alt || article.title}
-            width={article.media_width}
-            height={article.media_height}
-            className="w-full rounded-lg shadow-md"
+            fill
+            sizes="(max-width: 768px) 100vw, 800px"
+            className="rounded-lg shadow-md object-cover"
+            unoptimized
+            priority
           />
         </figure>
       )}
