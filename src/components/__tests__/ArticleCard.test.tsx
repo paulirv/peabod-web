@@ -92,7 +92,9 @@ describe('ArticleCard Component', () => {
 
       const image = screen.getByRole('img');
       expect(image).toBeInTheDocument();
-      expect(image).toHaveAttribute('src', '/api/media/uploads/test-image.jpg');
+      // Cloudflare Image Transformation URL format
+      expect(image.getAttribute('src')).toContain('/api/media/uploads/test-image.jpg');
+      expect(image.getAttribute('src')).toContain('/cdn-cgi/image/');
       expect(image).toHaveAttribute('alt', 'Test Image');
     });
 

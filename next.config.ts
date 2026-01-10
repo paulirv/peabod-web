@@ -12,6 +12,15 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // Compress responses
   compress: true,
+  // Allow images from production domain for Cloudflare Image Transformations
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "peabod.com",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

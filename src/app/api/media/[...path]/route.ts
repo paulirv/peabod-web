@@ -12,14 +12,18 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
 ) {
+  const { path } = await params;
+  const objectKey = path.join("/");
+
   try {
     const bucket = getR2Bucket();
-    const { path } = await params;
-    const objectKey = path.join("/");
-
     const object = await bucket.get(objectKey);
 
     if (!object) {
+      // In development, try fetching from production as fallback
+      if (process.env.NODE_ENV === "development") {
+        return fetchFromProduction(objectKey);
+      }
       return NextResponse.json(
         { error: "Image not found" },
         { status: 404 }
@@ -36,9 +40,46 @@ export async function GET(
     });
 
   } catch (error) {
+    // In development, fall back to production if R2 fails
+    if (process.env.NODE_ENV === "development") {
+      console.log("R2 unavailable locally, proxying from production:", objectKey);
+      return fetchFromProduction(objectKey);
+    }
     console.error("Error serving media:", error);
     return NextResponse.json(
       { error: "Failed to serve media" },
+      { status: 500 }
+    );
+  }
+}
+
+// Fetch image from production (for local development)
+async function fetchFromProduction(objectKey: string): Promise<NextResponse> {
+  try {
+    const prodUrl = `https://peabod.com/api/media/${objectKey}`;
+    const response = await fetch(prodUrl);
+
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: "Image not found" },
+        { status: 404 }
+      );
+    }
+
+    const contentType = response.headers.get("Content-Type") || "image/jpeg";
+    const body = await response.arrayBuffer();
+
+    return new NextResponse(body, {
+      status: 200,
+      headers: {
+        "Content-Type": contentType,
+        "Cache-Control": "public, max-age=3600",
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching from production:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch media" },
       { status: 500 }
     );
   }

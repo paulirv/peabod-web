@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { ResponsiveImageContainer } from "./ResponsiveImage";
 
 interface Tag {
   id: number;
@@ -31,8 +31,6 @@ export default function ArticleCard({
   body,
   media_path,
   media_alt,
-  media_width: _media_width,
-  media_height: _media_height,
   tags,
   isAdmin,
 }: ArticleCardProps) {
@@ -52,14 +50,13 @@ export default function ArticleCard({
       }}
     >
       {media_path && (
-        <Link href={`/article/${slug}`} className="block relative h-48">
-          <Image
-            src={`/api/media/${media_path}`}
+        <Link href={`/article/${slug}`} className="block">
+          <ResponsiveImageContainer
+            path={media_path}
             alt={media_alt || title}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover"
-            unoptimized
+            preset="card"
+            aspectRatio="auto"
+            containerClassName="h-48 w-full"
           />
         </Link>
       )}

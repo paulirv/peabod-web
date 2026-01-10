@@ -2,7 +2,7 @@
 
 import { useState, FormEvent, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import { ResponsiveImageContainer } from "@/components/ResponsiveImage";
 import MediaMetadataEditor from "./MediaMetadataEditor";
 
 interface EditorField {
@@ -188,16 +188,13 @@ export default function Editor({
                   </div>
                 ) : formData[field.name] ? (
                   <div className="relative inline-block max-w-xs">
-                    <div className="relative h-48 w-full">
-                      <Image
-                        src={`/api/media/${formData[field.name]}`}
-                        alt="Preview"
-                        fill
-                        sizes="320px"
-                        className="rounded-lg border border-gray-300 object-contain"
-                        unoptimized
-                      />
-                    </div>
+                    <ResponsiveImageContainer
+                      path={formData[field.name] as string}
+                      alt="Preview"
+                      preset="mediaPreview"
+                      containerClassName="h-48 w-full rounded-lg border border-gray-300"
+                      objectFit="contain"
+                    />
                     <button
                       type="button"
                       onClick={() => handleImageRemove(field.name)}

@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { ResponsiveImageContainer } from "@/components/ResponsiveImage";
 import type { Media } from "@/types/media";
 
 interface MediaCardProps {
@@ -52,13 +52,11 @@ export default function MediaCard({
             </svg>
           </div>
         ) : (
-          <Image
-            src={`/api/media/${media.path}`}
+          <ResponsiveImageContainer
+            path={media.path}
             alt={media.alt || media.title}
-            fill
-            sizes="(max-width: 768px) 50vw, 200px"
-            className="object-cover"
-            unoptimized
+            preset="mediaThumbnail"
+            containerClassName="w-full h-full"
           />
         )}
 

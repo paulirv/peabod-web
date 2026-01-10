@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { ResponsiveImageContainer } from "@/components/ResponsiveImage";
 import MediaCard from "@/components/admin/MediaCard";
 import type { Media, MediaWithUsage, MediaUsageDetails } from "@/types/media";
 
@@ -444,13 +444,11 @@ export default function MediaLibraryPage() {
                           </svg>
                         </div>
                       ) : (
-                        <Image
-                          src={`/admin/api/media/${item.path}`}
+                        <ResponsiveImageContainer
+                          path={item.path}
                           alt={item.alt || item.title}
-                          fill
-                          sizes="64px"
-                          className="object-cover"
-                          unoptimized
+                          preset="tableThumb"
+                          containerClassName="w-full h-full"
                         />
                       )}
                     </div>
@@ -707,13 +705,12 @@ function EditMediaForm({
             </svg>
           </div>
         ) : (
-          <Image
-            src={`/admin/api/media/${media.path}`}
+          <ResponsiveImageContainer
+            path={media.path}
             alt={media.alt || media.title}
-            fill
-            sizes="(max-width: 768px) 100vw, 500px"
-            className="object-contain"
-            unoptimized
+            preset="mediaPreview"
+            containerClassName="w-full h-full"
+            objectFit="contain"
           />
         )}
       </div>

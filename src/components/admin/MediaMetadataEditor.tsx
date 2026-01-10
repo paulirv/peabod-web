@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
+import { ResponsiveImageContainer } from "@/components/ResponsiveImage";
 import type { Media } from "@/types/media";
 
 interface MediaMetadataEditorProps {
@@ -276,13 +276,11 @@ export default function MediaMetadataEditor({
               </svg>
             </div>
           ) : (
-            <Image
-              src={`/api/media/${media?.path}`}
+            <ResponsiveImageContainer
+              path={media?.path || ""}
               alt={media?.alt || media?.title || "Media preview"}
-              fill
-              sizes="80px"
-              className="object-cover"
-              unoptimized
+              preset="mediaThumbnail"
+              containerClassName="w-full h-full"
             />
           )}
         </div>
