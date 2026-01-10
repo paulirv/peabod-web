@@ -3,6 +3,28 @@ import { NextRequest } from 'next/server';
 import { GET, POST } from '../articles/route';
 import { createSessionUser, createTestArticle } from '@/test/utils/factories';
 
+// Response type definitions for type-safe JSON parsing
+interface ArticlesListResponse {
+  success: boolean;
+  data: {
+    items: Array<{ id: number; title: string; slug: string }>;
+    total: number;
+    limit: number;
+    offset: number;
+  };
+}
+
+interface ArticleCreateResponse {
+  success: boolean;
+  data?: { id: number; slug: string };
+  error?: string;
+}
+
+interface ErrorResponse {
+  success: boolean;
+  error: string;
+}
+
 // Mock dependencies
 vi.mock('@/lib/db', () => ({
   getDB: vi.fn(),
@@ -46,7 +68,7 @@ describe('/admin/api/articles', () => {
 
         const request = new NextRequest('http://localhost:3000/admin/api/articles');
         const response = await GET(request);
-        const data = await response.json();
+        const data = (await response.json()) as ErrorResponse;
 
         expect(response.status).toBe(401);
         expect(data.error).toBe('Authentication required');
@@ -98,7 +120,7 @@ describe('/admin/api/articles', () => {
 
         const request = new NextRequest('http://localhost:3000/admin/api/articles');
         const response = await GET(request);
-        const data = await response.json();
+        const data = (await response.json()) as ArticlesListResponse;
 
         expect(response.status).toBe(200);
         expect(data.success).toBe(true);
@@ -141,7 +163,7 @@ describe('/admin/api/articles', () => {
 
         const request = new NextRequest('http://localhost:3000/admin/api/articles?limit=10&offset=20');
         const response = await GET(request);
-        const data = await response.json();
+        const data = (await response.json()) as ArticlesListResponse;
 
         expect(data.data.limit).toBe(10);
         expect(data.data.offset).toBe(20);
@@ -162,7 +184,7 @@ describe('/admin/api/articles', () => {
 
         const request = new NextRequest('http://localhost:3000/admin/api/articles');
         const response = await GET(request);
-        const data = await response.json();
+        const data = (await response.json()) as ArticlesListResponse;
 
         expect(data.data.limit).toBe(50);
         expect(data.data.offset).toBe(0);
@@ -182,7 +204,7 @@ describe('/admin/api/articles', () => {
 
         const request = new NextRequest('http://localhost:3000/admin/api/articles');
         const response = await GET(request);
-        const data = await response.json();
+        const data = (await response.json()) as ErrorResponse;
 
         expect(response.status).toBe(500);
         expect(data.success).toBe(false);
@@ -240,7 +262,7 @@ describe('/admin/api/articles', () => {
         });
 
         const response = await POST(request);
-        const data = await response.json();
+        const data = (await response.json()) as ErrorResponse;
 
         expect(response.status).toBe(400);
         expect(data.error).toBe('Missing required fields');
@@ -255,7 +277,7 @@ describe('/admin/api/articles', () => {
         });
 
         const response = await POST(request);
-        const data = await response.json();
+        const data = (await response.json()) as ErrorResponse;
 
         expect(response.status).toBe(400);
         expect(data.error).toBe('Missing required fields');
@@ -270,7 +292,7 @@ describe('/admin/api/articles', () => {
         });
 
         const response = await POST(request);
-        const data = await response.json();
+        const data = (await response.json()) as ErrorResponse;
 
         expect(response.status).toBe(400);
         expect(data.error).toBe('Missing required fields');
@@ -304,7 +326,7 @@ describe('/admin/api/articles', () => {
         });
 
         const response = await POST(request);
-        const data = await response.json();
+        const data = (await response.json()) as ArticleCreateResponse;
 
         expect(response.status).toBe(201);
         expect(data.success).toBe(true);
@@ -427,7 +449,7 @@ describe('/admin/api/articles', () => {
         });
 
         const response = await POST(request);
-        const data = await response.json();
+        const data = (await response.json()) as ErrorResponse;
 
         expect(response.status).toBe(409);
         expect(data.error).toBe('Article with this slug already exists');
@@ -456,7 +478,7 @@ describe('/admin/api/articles', () => {
         });
 
         const response = await POST(request);
-        const data = await response.json();
+        const data = (await response.json()) as ErrorResponse;
 
         expect(response.status).toBe(500);
         expect(data.error).toBe('Failed to create article');

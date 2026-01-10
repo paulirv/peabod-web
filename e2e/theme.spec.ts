@@ -155,7 +155,7 @@ test.describe('Accessibility', () => {
     await page.keyboard.press('Tab');
 
     const focusedElement = await page.evaluate(() => {
-      const el = document.activeElement;
+      const el = document.activeElement as HTMLElement | null;
       return el ? {
         tagName: el.tagName,
         tabIndex: el.tabIndex,
