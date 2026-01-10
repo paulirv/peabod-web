@@ -3,15 +3,13 @@ import { getDB } from "@/lib/db";
 import { getSessionUser } from "@/lib/session";
 
 // GET - Get current user
+// Returns 200 with data: null if not authenticated (not an error state)
 export async function GET() {
   try {
     const user = await getSessionUser();
 
     if (!user) {
-      return NextResponse.json(
-        { success: false, error: "Not authenticated" },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: true, data: null });
     }
 
     // Get avatar URL if exists

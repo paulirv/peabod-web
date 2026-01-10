@@ -40,15 +40,15 @@ describe('/api/auth/me', () => {
 
   describe('GET /api/auth/me', () => {
     describe('Authentication', () => {
-      it('should return 401 when not authenticated', async () => {
+      it('should return 200 with null data when not authenticated', async () => {
         mockGetSessionUser.mockResolvedValue(null);
 
         const response = await GET();
         const data = await response.json();
 
-        expect(response.status).toBe(401);
-        expect(data.success).toBe(false);
-        expect(data.error).toBe('Not authenticated');
+        expect(response.status).toBe(200);
+        expect(data.success).toBe(true);
+        expect(data.data).toBeNull();
       });
     });
 
