@@ -1,14 +1,16 @@
 import { headers } from "next/headers";
+import { getSessionUser, type SessionUser } from "./session";
+
+// Re-export SessionUser type for convenience
+export type { SessionUser } from "./session";
 
 /**
- * Check if the current request is from an authenticated CMS admin.
+ * Check if the current request is from a Zero Trust authenticated admin.
+ * This is used for /admin/* routes protected by Cloudflare Access.
  *
- * When Zero Trust is configured with a Bypass policy for the frontend,
- * authenticated users will have their JWT passed via CF-Access-JWT-Assertion header.
- *
- * Returns the user's email if authenticated, null otherwise.
+ * Returns the user's email if authenticated via Zero Trust, null otherwise.
  */
-export async function getAuthenticatedUser(): Promise<string | null> {
+export async function getZeroTrustUser(): Promise<string | null> {
   try {
     const headersList = await headers();
     const jwt = headersList.get("cf-access-jwt-assertion");
@@ -18,28 +20,68 @@ export async function getAuthenticatedUser(): Promise<string | null> {
     }
 
     // Decode the JWT payload (base64url encoded)
-    // JWT format: header.payload.signature
     const parts = jwt.split(".");
     if (parts.length !== 3) {
       return null;
     }
 
-    const payload = JSON.parse(
-      Buffer.from(parts[1], "base64url").toString("utf-8")
-    );
+    // Use atob with base64url conversion for Workers compatibility
+    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const payload = JSON.parse(atob(base64));
 
-    // Return the email claim from the JWT
     return payload.email || null;
   } catch (error) {
-    console.error("Error checking authentication:", error);
+    console.error("Error checking Zero Trust authentication:", error);
     return null;
   }
 }
 
 /**
- * Check if the current user is an authenticated admin.
+ * Check if the current request is from a Zero Trust admin.
+ * @deprecated Use getZeroTrustUser() for clarity
+ */
+export async function getAuthenticatedUser(): Promise<string | null> {
+  return getZeroTrustUser();
+}
+
+/**
+ * Check if the current user is an authenticated admin (Zero Trust).
  */
 export async function isAdmin(): Promise<boolean> {
-  const user = await getAuthenticatedUser();
+  const user = await getZeroTrustUser();
   return user !== null;
+}
+
+/**
+ * Get the current public user (cookie-based session)
+ */
+export async function getCurrentUser(): Promise<SessionUser | null> {
+  return getSessionUser();
+}
+
+/**
+ * Check if current user is logged in (public auth)
+ */
+export async function isAuthenticated(): Promise<boolean> {
+  const user = await getSessionUser();
+  return user !== null;
+}
+
+/**
+ * Check if current user is the superadmin (user ID 1)
+ */
+export async function isSuperAdmin(): Promise<boolean> {
+  const user = await getSessionUser();
+  return user?.is_superadmin ?? false;
+}
+
+/**
+ * Require authentication - throws if not authenticated
+ */
+export async function requireAuth(): Promise<SessionUser> {
+  const user = await getSessionUser();
+  if (!user) {
+    throw new Error("Authentication required");
+  }
+  return user;
 }

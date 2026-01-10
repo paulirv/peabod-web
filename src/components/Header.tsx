@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import ThemeSwitcher from "./ThemeSwitcher";
+import AuthMenu from "./AuthMenu";
 
 export default function Header() {
   return (
@@ -41,6 +42,7 @@ export default function Header() {
               About
             </Link>
             <ThemeSwitcher />
+            <AuthMenu />
           </div>
         </nav>
       </div>

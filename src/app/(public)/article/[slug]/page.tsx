@@ -1,5 +1,5 @@
 import { getDB } from "@/lib/db";
-import { isAdmin } from "@/lib/auth";
+import { getSessionUser } from "@/lib/session";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
@@ -83,11 +83,13 @@ export default async function ArticlePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [article, admin] = await Promise.all([getArticle(slug), isAdmin()]);
+  const [article, user] = await Promise.all([getArticle(slug), getSessionUser()]);
 
   if (!article) {
     notFound();
   }
+
+  const canEdit = user && (user.role === "admin" || user.role === "editor");
 
   const formattedDate = new Date(article.authored_on).toLocaleDateString(
     "en-US",
@@ -107,13 +109,13 @@ export default async function ArticlePage({
         >
           &larr; Back to all articles
         </Link>
-        {admin && (
-          <a
-            href={`https://cms.peabod.com/articles/${article.id}/edit`}
+        {canEdit && (
+          <Link
+            href={`/admin/articles/${article.id}/edit`}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
           >
             Edit Article
-          </a>
+          </Link>
         )}
       </div>
 

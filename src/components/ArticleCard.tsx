@@ -107,7 +107,7 @@ export default function ArticleCard({
           </Link>
           {isAdmin && (
             <a
-              href={`https://cms.peabod.com/articles/${id}/edit`}
+              href={`/admin/articles/${id}/edit`}
               className="text-sm font-medium px-3 py-1 rounded-full"
               style={{
                 backgroundColor: "var(--secondary)",
