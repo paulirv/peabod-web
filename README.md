@@ -10,7 +10,7 @@ Next.js application for [peabod.com](https://peabod.com) - a personal blog and C
 - **Framework**: Next.js 15 with App Router
 - **Deployment**: Cloudflare Workers via OpenNext
 - **Database**: Cloudflare D1 (SQLite)
-- **Storage**: Cloudflare R2 (media/images)
+- **Storage**: Cloudflare R2 (images), Cloudflare Stream (video)
 - **Styling**: Tailwind CSS 4
 
 ## Features
@@ -26,7 +26,8 @@ Next.js application for [peabod.com](https://peabod.com) - a personal blog and C
 - Article management (create, edit, publish)
 - Page management
 - Tag management
-- Media library with EXIF extraction
+- Media library with image EXIF extraction and video upload via Cloudflare Stream
+- Featured media support (images or videos) for articles and pages
 - User management with role-based access (admin, editor, author)
 
 ## Getting Started
@@ -58,6 +59,7 @@ Or run migrations incrementally:
 wrangler d1 execute peabod-db --file=./migrations/001_add_media_table.sql
 wrangler d1 execute peabod-db --file=./migrations/002_add_users_sessions.sql
 wrangler d1 execute peabod-db --file=./migrations/003_add_user_roles.sql
+wrangler d1 execute peabod-db --file=./migrations/004_add_stream_video_fields.sql
 ```
 
 ### Testing
@@ -112,7 +114,12 @@ src/
 Configured via `wrangler.toml`:
 - `DB` - D1 database binding
 - `MEDIA` - R2 bucket binding
+- `CF_ACCOUNT_ID` - Cloudflare account ID (for Stream API)
+- `STREAM_CUSTOMER_SUBDOMAIN` - Cloudflare Stream customer subdomain
 - `ENVIRONMENT` - production/development
+
+Secrets (via `wrangler secret put`):
+- `CF_API_TOKEN` - Cloudflare API token with Stream:Edit permission
 
 ## Authentication
 

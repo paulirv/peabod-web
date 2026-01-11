@@ -16,32 +16,36 @@ Add a WYSIWYG editor for articles and pages to replace plain textarea input.
 - **Caption field** - Short caption for display beneath images
 - **Long description field** - Extended description for accessibility and detailed context
 
-### Video Support (Cloudflare Stream)
+### ~~Video Support (Cloudflare Stream)~~ ✅ Completed
 
-Add video as a new media type using Cloudflare Stream for video hosting and delivery.
+Video support has been implemented. See the implementation details below for reference.
 
-**Key design decisions:**
-- Extend existing `media` table with video-specific fields (stream_uid, duration, thumbnail_url, stream_status, stream_error, stream_meta)
-- Direct browser-to-Stream uploads via signed TUS URLs (no server proxy)
-- Use Cloudflare's embedded iframe player for video playback
-- Polling for status updates (webhook optional enhancement)
+**What was built:**
+- Extended `media` table with video fields (stream_uid, duration, thumbnail_url, stream_status, stream_error, stream_meta)
+- Direct browser-to-Stream uploads using FormData POST (not TUS - see LESSONS-LEARNED.md)
+- Cloudflare Stream embedded iframe player for video playback
+- Status polling during video processing
 
-**Two video creation methods:**
-1. **Upload new video** - TUS upload directly to Stream with progress tracking
-2. **Add existing video** - Enter Stream video UID to link an existing video from Cloudflare dashboard
-
-**New files:**
+**Files created:**
 - `src/lib/stream.ts` - Stream API client
-- `src/app/admin/api/video/upload-url/route.ts` - Get signed TUS upload URL
-- `src/app/admin/api/video/[uid]/status/route.ts` - Check processing status
-- `src/app/admin/api/video/link/route.ts` - Link existing Stream video
-- `src/components/admin/VideoUploader.tsx` - Upload UI with TUS client
-- `src/components/admin/VideoLinker.tsx` - UI for adding existing video by ID
+- `src/app/admin/api/video/upload-url/route.ts` - Get signed upload URL
+- `src/app/admin/api/video/[uid]/route.ts` - Get video details and status
+- `src/components/admin/VideoUploader.tsx` - Upload UI with progress tracking
 - `src/components/StreamPlayer.tsx` - Cloudflare Stream player wrapper
 
-**Configuration required:**
-- `CF_ACCOUNT_ID` and `STREAM_CUSTOMER_SUBDOMAIN` in wrangler.toml
-- `CF_API_TOKEN` secret with Stream:Edit permission
-- npm dependency: `tus-js-client`
+**Featured media support:**
+- Articles and pages can use images or videos as featured media
+- MediaMetadataEditor provides three options: Select from Library, Upload Image, Upload Video
+- Video thumbnails display with play overlay on article cards
+- Full StreamPlayer on article/page detail views
 
-See full implementation plan: `.claude/plans/resilient-finding-cascade.md`
+---
+
+## Video Enhancements (Future)
+
+Potential future improvements to video support:
+- Signed playback URLs for private videos
+- Custom thumbnail time selection
+- Video chapters/markers
+- Bulk video upload queue
+- Webhook handler for Stream notifications (currently using polling)
