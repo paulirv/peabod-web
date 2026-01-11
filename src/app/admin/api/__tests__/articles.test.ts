@@ -253,19 +253,27 @@ describe('/admin/api/articles', () => {
         });
       });
 
-      it('should return 400 when slug is missing', async () => {
+      it('should auto-generate slug from title when slug is missing', async () => {
+        const bindMock = vi.fn(() => ({
+          run: vi.fn().mockResolvedValue({ meta: { last_row_id: 1 } }),
+          first: vi.fn().mockResolvedValue(createTestArticle()),
+        }));
+
+        mockDB.prepare.mockReturnValue({ bind: bindMock });
+
         const request = createRequest({
-          title: 'Test Article',
+          title: 'My Test Article Title',
           body: 'Content',
           author: 'Author',
           authored_on: '2024-01-01',
         });
 
         const response = await POST(request);
-        const data = (await response.json()) as ErrorResponse;
+        expect(response.status).toBe(201);
 
-        expect(response.status).toBe(400);
-        expect(data.error).toBe('Missing required fields');
+        // Verify the slug was auto-generated from title
+        const firstCall = bindMock.mock.calls[0];
+        expect(firstCall[0]).toBe('my-test-article-title');
       });
 
       it('should return 400 when title is missing', async () => {

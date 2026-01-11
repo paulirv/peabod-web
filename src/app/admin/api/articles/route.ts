@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
 }
 
 interface CreateArticleBody {
-  slug: string;
+  slug?: string;
   title: string;
   body: string;
   author: string;
@@ -125,6 +125,17 @@ interface CreateArticleBody {
   media_id?: number;   // Reference to media table
   published?: boolean;
   tag_ids?: number[];
+}
+
+// Generate a URL-friendly slug from a title
+function generateSlugFromTitle(title: string): string {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "") // Remove special characters
+    .replace(/\s+/g, "-")      // Replace spaces with hyphens
+    .replace(/-+/g, "-")       // Replace multiple hyphens with single
+    .replace(/^-|-$/g, "");    // Remove leading/trailing hyphens
 }
 
 // Sanitize slug: remove leading/trailing slashes and spaces
@@ -142,14 +153,17 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as CreateArticleBody;
     const { slug: rawSlug, title, body: content, author, authored_on, image, media_id, published, tag_ids } = body;
 
-    if (!rawSlug || !title || !content || !author || !authored_on) {
+    if (!title || !content || !author || !authored_on) {
       return NextResponse.json(
         { success: false, error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    const slug = sanitizeSlug(rawSlug);
+    // Generate slug from title if not provided or empty
+    const slug = rawSlug?.trim()
+      ? sanitizeSlug(rawSlug)
+      : generateSlugFromTitle(title);
 
     const result = await db
       .prepare(

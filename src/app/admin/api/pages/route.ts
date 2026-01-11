@@ -88,13 +88,29 @@ export async function GET(request: NextRequest) {
 }
 
 interface CreatePageBody {
-  slug: string;
+  slug?: string;
   title: string;
   body: string;
   author: string;
   authored_on: string;
   media_id?: number;
   published?: boolean;
+}
+
+// Generate a URL-friendly slug from a title
+function generateSlugFromTitle(title: string): string {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "") // Remove special characters
+    .replace(/\s+/g, "-")      // Replace spaces with hyphens
+    .replace(/-+/g, "-")       // Replace multiple hyphens with single
+    .replace(/^-|-$/g, "");    // Remove leading/trailing hyphens
+}
+
+// Sanitize slug: remove leading/trailing slashes and spaces
+function sanitizeSlug(slug: string): string {
+  return slug.trim().replace(/^\/+|\/+$/g, "").toLowerCase();
 }
 
 // POST /api/pages - Create new page
@@ -105,14 +121,19 @@ export async function POST(request: NextRequest) {
   try {
     const db = getDB();
     const body = (await request.json()) as CreatePageBody;
-    const { slug, title, body: content, author, authored_on, media_id, published } = body;
+    const { slug: rawSlug, title, body: content, author, authored_on, media_id, published } = body;
 
-    if (!slug || !title || !content || !author || !authored_on) {
+    if (!title || !content || !author || !authored_on) {
       return NextResponse.json(
         { success: false, error: "Missing required fields" },
         { status: 400 }
       );
     }
+
+    // Generate slug from title if not provided or empty
+    const slug = rawSlug?.trim()
+      ? sanitizeSlug(rawSlug)
+      : generateSlugFromTitle(title);
 
     const result = await db
       .prepare(
