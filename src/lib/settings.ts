@@ -6,6 +6,7 @@ export interface PublicSettings {
   site_url: string | null;
   meta_title_suffix: string | null;
   site_icon_path: string | null;
+  default_og_image_path: string | null;
   logo_path: string | null;
   logo_text_display: string | null;  // 'none', 'after', 'below'
   social_twitter: string | null;
@@ -31,6 +32,7 @@ export async function getPublicSettings(): Promise<PublicSettings | null> {
           s.site_url,
           s.meta_title_suffix,
           icon.path as site_icon_path,
+          og.path as default_og_image_path,
           logo.path as logo_path,
           s.logo_text_display,
           s.social_twitter,
@@ -42,6 +44,7 @@ export async function getPublicSettings(): Promise<PublicSettings | null> {
           s.social_substack
         FROM settings s
         LEFT JOIN media icon ON s.site_icon_id = icon.id
+        LEFT JOIN media og ON s.default_og_image_id = og.id
         LEFT JOIN media logo ON s.logo_media_id = logo.id
         WHERE s.id = 1
       `)
