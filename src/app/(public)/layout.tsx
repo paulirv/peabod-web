@@ -18,7 +18,7 @@ export default async function PublicLayout({
       <div className="min-h-screen flex flex-col">
         <Header siteName={siteName} logoPath={logoPath} logoTextDisplay={logoTextDisplay} />
         <main className="flex-1">{children}</main>
-        <Footer />
+        <Footer siteName={siteName} />
       </div>
     </ThemeProvider>
   );

@@ -1,0 +1,33 @@
+# Progress: fix/github-issues-4-5-6
+
+## Issues Being Fixed
+- Issue #4: Redirect to www.peabod.com
+- Issue #5: Remove copyright field from settings, auto-generate in footer
+- Issue #6: Move theme picker from menu to footer
+
+## Completed Work
+
+### Issue #4: www Redirect
+- Updated `src/middleware.ts` to redirect `peabod.com` to `www.peabod.com` with 301 status
+- Expanded middleware matcher to handle all routes (previously only /admin routes)
+
+### Issue #5: Copyright Field Removal
+- Removed `copyright_text` from `SiteSettings` interface in `src/app/admin/api/settings/route.ts`
+- Removed `copyright_text` from `UpdateSettingsBody` interface
+- Removed field from the update fields array
+- Removed `copyright_text` from `PublicSettings` interface in `src/lib/settings.ts`
+- Removed field from the SQL query
+- Removed Copyright Text input from admin settings page `src/app/admin/(dashboard)/settings/page.tsx`
+- Updated Footer to accept `siteName` prop and auto-generate copyright as "© [year] [siteName]. All rights reserved."
+- Updated public layout to pass `siteName` to Footer
+
+### Issue #6: Theme Picker in Footer
+- Moved theme picker from Header hamburger menu to Footer
+- Implemented as a right-aligned chip showing current theme name and color preview
+- Clicking chip opens a dropdown with Light and Dark theme sections
+- Removed theme picker UI and related state from Header component
+- Footer is now a client component with proper click-outside handling
+
+## Testing
+- All 184 unit tests pass
+- Lint passes with only pre-existing warnings (unrelated to these changes)

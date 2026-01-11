@@ -18,7 +18,6 @@ export interface SiteSettings {
   logo_media_id: number | null;
   logo_path?: string | null;
   logo_text_display: string | null;  // 'none', 'after', 'below'
-  copyright_text: string | null;
   // Content settings
   posts_per_page: number;
   // Contact info
@@ -87,7 +86,6 @@ interface UpdateSettingsBody {
   site_icon_id?: number | null;
   logo_media_id?: number | null;
   logo_text_display?: string | null;
-  copyright_text?: string | null;
   posts_per_page?: number;
   contact_email?: string | null;
   social_twitter?: string | null;
@@ -121,7 +119,6 @@ export async function PUT(request: NextRequest) {
       "site_icon_id",
       "logo_media_id",
       "logo_text_display",
-      "copyright_text",
       "posts_per_page",
       "contact_email",
       "social_twitter",

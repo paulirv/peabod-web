@@ -5,6 +5,14 @@ const SESSION_COOKIE_NAME = "peabod_session";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const host = request.headers.get("host") || "";
+
+  // Redirect non-www to www in production
+  if (host === "peabod.com") {
+    const url = request.nextUrl.clone();
+    url.host = "www.peabod.com";
+    return NextResponse.redirect(url, 301);
+  }
 
   // Allow access to login page without auth
   if (pathname === "/admin/login") {
@@ -25,5 +33,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
