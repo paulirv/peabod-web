@@ -49,3 +49,43 @@ npx wrangler deploy
 If it says "No updated asset files to upload" but you made frontend changes, the `.open-next` directory is stale and needs to be rebuilt with the OpenNext build command.
 
 ---
+
+## Cloudflare Stream Direct Uploads
+
+**Date:** 2026-01-10
+
+**Problem:** Video uploads to Cloudflare Stream were failing with "Decoding Error" when using the TUS protocol with tus-js-client.
+
+**Root Cause:** The Cloudflare Stream `/stream/direct_upload` API endpoint returns a one-time upload URL designed for **basic uploads** (simple POST with FormData), not for TUS resumable uploads. When tus-js-client tried to use TUS protocol methods (PATCH requests, Upload-Metadata headers), Cloudflare rejected them.
+
+The error messages were:
+- "Decoding Error: A portion of the request could be not decoded"
+- "Basic uploads must be made using POST method"
+
+**Solution:** Use a simple FormData POST upload with XMLHttpRequest instead of TUS:
+
+```typescript
+// Get upload URL from our API
+const { uploadURL, uid } = await getUploadUrl();
+
+// Upload using FormData with XMLHttpRequest for progress tracking
+const formData = new FormData();
+formData.append("file", file);
+
+const xhr = new XMLHttpRequest();
+xhr.upload.addEventListener("progress", (e) => {
+  if (e.lengthComputable) {
+    const percentage = Math.round((e.loaded / e.total) * 100);
+    setProgress(percentage);
+  }
+});
+
+xhr.open("POST", uploadURL);
+xhr.send(formData);
+```
+
+**Key Insight:** Cloudflare Stream's `/stream/direct_upload` endpoint is for basic uploads. TUS resumable uploads require a different setup where the TUS client POSTs to your own backend endpoint, which then forwards TUS headers to Cloudflare and returns a Location header. For most use cases, basic uploads with progress tracking are sufficient and simpler.
+
+**Bonus:** Removing tus-js-client reduced the page bundle size by ~21kB.
+
+---

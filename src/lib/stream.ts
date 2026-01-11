@@ -41,6 +41,7 @@ function getStreamConfig(): StreamConfig {
 /**
  * Request a direct upload URL for TUS upload
  * The browser can upload directly to this URL
+ * Uses the /direct_upload endpoint which returns a one-time upload URL
  */
 export async function createDirectUpload(
   maxDurationSeconds: number = 3600,
@@ -49,7 +50,7 @@ export async function createDirectUpload(
   const config = getStreamConfig();
 
   const response = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${config.accountId}/stream?direct_user=true`,
+    `https://api.cloudflare.com/client/v4/accounts/${config.accountId}/stream/direct_upload`,
     {
       method: "POST",
       headers: {
@@ -66,13 +67,15 @@ export async function createDirectUpload(
   const data = (await response.json()) as {
     success: boolean;
     result?: { uploadURL: string; uid: string };
-    errors?: Array<{ message: string }>;
+    errors?: Array<{ message: string; code?: number }>;
+    messages?: Array<{ message: string }>;
   };
 
   if (!data.success || !data.result) {
-    throw new Error(
-      data.errors?.[0]?.message || "Failed to create upload URL"
-    );
+    const errorMsg = data.errors?.[0]?.message
+      || data.messages?.[0]?.message
+      || "Failed to create upload URL";
+    throw new Error(errorMsg);
   }
 
   return {

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import * as tus from "tus-js-client";
 import type { Media } from "@/types/media";
 
 interface VideoUploaderProps {
@@ -37,7 +36,7 @@ export default function VideoUploader({
   const [error, setError] = useState<string | null>(null);
   const [streamUid, setStreamUid] = useState<string | null>(null);
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const uploadRef = useRef<tus.Upload | null>(null);
+  const xhrRef = useRef<XMLHttpRequest | null>(null);
 
   // Poll for processing status
   useEffect(() => {
@@ -116,31 +115,43 @@ export default function VideoUploader({
       const { uploadURL, uid } = urlData.data;
       setStreamUid(uid);
 
-      // Upload via TUS
-      const upload = new tus.Upload(file, {
-        endpoint: uploadURL,
-        retryDelays: [0, 1000, 3000, 5000],
-        chunkSize: 50 * 1024 * 1024, // 50MB chunks
-        metadata: {
-          filename: file.name,
-          filetype: file.type,
-        },
-        onProgress: (bytesUploaded, bytesTotal) => {
-          const percentage = Math.round((bytesUploaded / bytesTotal) * 100);
+      // Upload using FormData with XMLHttpRequest for progress
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const xhr = new XMLHttpRequest();
+      xhrRef.current = xhr;
+
+      xhr.upload.addEventListener("progress", (e) => {
+        if (e.lengthComputable) {
+          const percentage = Math.round((e.loaded / e.total) * 100);
           setProgress(percentage);
-        },
-        onSuccess: () => {
-          setStatus("processing");
-          setProgress(100);
-        },
-        onError: (err) => {
-          setStatus("error");
-          setError(err.message || "Upload failed");
-        },
+        }
       });
 
-      uploadRef.current = upload;
-      upload.start();
+      xhr.addEventListener("load", () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          setStatus("processing");
+          setProgress(100);
+        } else {
+          setStatus("error");
+          setError(`Upload failed: ${xhr.statusText || "Unknown error"}`);
+        }
+      });
+
+      xhr.addEventListener("error", () => {
+        setStatus("error");
+        setError("Upload failed: Network error");
+      });
+
+      xhr.addEventListener("abort", () => {
+        setStatus("idle");
+        setFile(null);
+        setProgress(0);
+      });
+
+      xhr.open("POST", uploadURL);
+      xhr.send(formData);
     } catch (err) {
       setStatus("error");
       setError(err instanceof Error ? err.message : "Upload failed");
@@ -148,8 +159,8 @@ export default function VideoUploader({
   };
 
   const handleCancel = () => {
-    if (uploadRef.current) {
-      uploadRef.current.abort();
+    if (xhrRef.current) {
+      xhrRef.current.abort();
     }
     if (pollIntervalRef.current) {
       clearInterval(pollIntervalRef.current);

@@ -16,7 +16,7 @@ function generateTitleFromFilename(filename: string): string {
 
 /**
  * POST /admin/api/video/upload-url
- * Get a signed URL for direct TUS upload to Cloudflare Stream
+ * Get a signed URL for direct upload to Cloudflare Stream
  */
 export async function POST(request: NextRequest) {
   const auth = await requireAuthor();
