@@ -237,6 +237,22 @@ export default function SettingsPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
+                Show Site Name with Logo
+              </label>
+              <select
+                value={settings.logo_text_display || "none"}
+                onChange={(e) => updateField("logo_text_display", e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white"
+              >
+                <option value="none">Don&apos;t show (logo only)</option>
+                <option value="after">After logo (to the right)</option>
+                <option value="below">Below logo</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-1">When a logo is set, optionally display the site name alongside it.</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Copyright Text
               </label>
               <input

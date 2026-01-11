@@ -17,6 +17,7 @@ export interface SiteSettings {
   site_icon_path?: string | null;
   logo_media_id: number | null;
   logo_path?: string | null;
+  logo_text_display: string | null;  // 'none', 'after', 'below'
   copyright_text: string | null;
   // Content settings
   posts_per_page: number;
@@ -85,6 +86,7 @@ interface UpdateSettingsBody {
   default_og_image_id?: number | null;
   site_icon_id?: number | null;
   logo_media_id?: number | null;
+  logo_text_display?: string | null;
   copyright_text?: string | null;
   posts_per_page?: number;
   contact_email?: string | null;
@@ -118,6 +120,7 @@ export async function PUT(request: NextRequest) {
       "default_og_image_id",
       "site_icon_id",
       "logo_media_id",
+      "logo_text_display",
       "copyright_text",
       "posts_per_page",
       "contact_email",

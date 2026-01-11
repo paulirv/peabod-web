@@ -7,6 +7,7 @@ export interface PublicSettings {
   meta_title_suffix: string | null;
   site_icon_path: string | null;
   logo_path: string | null;
+  logo_text_display: string | null;  // 'none', 'after', 'below'
   copyright_text: string | null;
   social_twitter: string | null;
   social_facebook: string | null;
@@ -32,6 +33,7 @@ export async function getPublicSettings(): Promise<PublicSettings | null> {
           s.meta_title_suffix,
           icon.path as site_icon_path,
           logo.path as logo_path,
+          s.logo_text_display,
           s.copyright_text,
           s.social_twitter,
           s.social_facebook,

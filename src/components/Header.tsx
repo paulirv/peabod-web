@@ -15,9 +15,10 @@ interface User {
 interface HeaderProps {
   siteName?: string;
   logoPath?: string | null;
+  logoTextDisplay?: string | null;  // 'none', 'after', 'below'
 }
 
-export default function Header({ siteName, logoPath }: HeaderProps) {
+export default function Header({ siteName, logoPath, logoTextDisplay }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [userLoading, setUserLoading] = useState(true);
@@ -88,15 +89,22 @@ export default function Header({ siteName, logoPath }: HeaderProps) {
           <nav className="flex items-center justify-between">
             <Link
               href="/"
-              className="text-2xl font-bold flex items-center"
+              className={`text-2xl font-bold flex ${logoTextDisplay === "below" ? "flex-col" : "items-center gap-2"}`}
               style={{ color: "var(--foreground)" }}
             >
               {logoPath ? (
-                <img
-                  src={`/api/media/${logoPath}?h=40`}
-                  alt={siteName || "Site Name"}
-                  className="h-10 w-auto"
-                />
+                <>
+                  <img
+                    src={`/api/media/${logoPath}?h=40`}
+                    alt={siteName || "Site Name"}
+                    className="h-10 w-auto"
+                  />
+                  {logoTextDisplay && logoTextDisplay !== "none" && (
+                    <span className={logoTextDisplay === "below" ? "text-base mt-1" : ""}>
+                      {siteName || "Site Name"}
+                    </span>
+                  )}
+                </>
               ) : (
                 siteName || "Site Name"
               )}

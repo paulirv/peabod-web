@@ -136,6 +136,7 @@ CREATE TABLE IF NOT EXISTS settings (
   -- Display
   site_icon_id INTEGER REFERENCES media(id) ON DELETE SET NULL,
   logo_media_id INTEGER REFERENCES media(id) ON DELETE SET NULL,
+  logo_text_display TEXT DEFAULT 'none',  -- 'none', 'after', 'below'
   copyright_text TEXT,
   -- Content settings
   posts_per_page INTEGER DEFAULT 10,
