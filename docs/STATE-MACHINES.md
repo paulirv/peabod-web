@@ -4,7 +4,7 @@ This document contains state machine diagrams for the stateful components in the
 
 ## Table of Contents
 
-1. [AuthMenu Component](#authmenu-component)
+1. [Header Component](#header-component)
 2. [LoginModal Component](#loginmodal-component)
 3. [RegisterModal Component](#registermodal-component)
 4. [MediaMetadataEditor Component](#mediametadataeditor-component)
@@ -15,9 +15,9 @@ This document contains state machine diagrams for the stateful components in the
 
 ---
 
-## AuthMenu Component
+## Header Component
 
-The AuthMenu manages user authentication state and modal visibility.
+The Header manages navigation, theme selection, and user authentication via a hamburger menu.
 
 ```mermaid
 stateDiagram-v2
@@ -25,20 +25,31 @@ stateDiagram-v2
     Loading --> LoggedOut: No User Found
     Loading --> LoggedIn: User Found
 
-    LoggedOut --> ShowLoginModal: Click Sign In
-    LoggedOut --> ShowRegisterModal: Click Register
+    state "Menu Closed" as MenuClosed
+    state "Menu Open" as MenuOpen
+
+    LoggedOut --> MenuClosed
+    LoggedIn --> MenuClosed
+
+    MenuClosed --> MenuOpen: Click Hamburger
+    MenuOpen --> MenuClosed: Click Outside
+    MenuOpen --> MenuClosed: Click Hamburger
+
+    MenuOpen --> ThemeChange: Select Theme
+    ThemeChange --> MenuOpen: Theme Applied
+
+    MenuOpen --> ShowLoginModal: Click Sign In
+    MenuOpen --> ShowRegisterModal: Click Create Account
 
     ShowLoginModal --> LoggedIn: Login Success
-    ShowLoginModal --> LoggedOut: Close Modal
+    ShowLoginModal --> MenuClosed: Close Modal
     ShowLoginModal --> ShowRegisterModal: Switch to Register
 
     ShowRegisterModal --> LoggedIn: Register Success
-    ShowRegisterModal --> LoggedOut: Close Modal
+    ShowRegisterModal --> MenuClosed: Close Modal
     ShowRegisterModal --> ShowLoginModal: Switch to Login
 
-    LoggedIn --> DropdownOpen: Click User Avatar
-    DropdownOpen --> LoggedIn: Click Outside
-    DropdownOpen --> LoggedOut: Logout
+    MenuOpen --> LoggedOut: Logout
 
     LoggedIn --> [*]: Unmount
     LoggedOut --> [*]: Unmount
@@ -381,7 +392,7 @@ High-level view of how stateful components interact.
 flowchart TB
     subgraph "Global State"
         ThemeProvider[ThemeProvider\nContext]
-        AuthState[Auth State\nAuthMenu]
+        AuthState[Auth State\nHeader]
     end
 
     subgraph "Admin Pages"
