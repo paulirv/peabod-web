@@ -95,12 +95,12 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${tag.name} - Tagged Articles`,
-    description: `Browse all articles tagged with "${tag.name}"`,
+    title: tag.name,
+    description: `Articles tagged with "${tag.name}"`,
     openGraph: {
       type: "website",
-      title: `${tag.name} - Tagged Articles`,
-      description: `Browse all articles tagged with "${tag.name}"`,
+      title: tag.name,
+      description: `Articles tagged with "${tag.name}"`,
     },
   };
 }
@@ -139,22 +139,11 @@ export default async function TagPage({
       </div>
 
       <div className="mb-12">
-        <div className="flex items-center gap-3 mb-4">
-          <span
-            className="px-4 py-2 text-lg rounded-full"
-            style={{
-              backgroundColor: "var(--primary)",
-              color: "var(--primary-foreground)",
-            }}
-          >
-            {tag.name}
-          </span>
-        </div>
         <h1 className="text-3xl font-bold" style={{ color: "var(--foreground)" }}>
-          Articles tagged &ldquo;{tag.name}&rdquo;
+          {tag.name}
         </h1>
         <p className="mt-2" style={{ color: "var(--muted-foreground)" }}>
-          {articles.length} {articles.length === 1 ? "article" : "articles"} found
+          {articles.length} {articles.length === 1 ? "article" : "articles"}
         </p>
       </div>
 
