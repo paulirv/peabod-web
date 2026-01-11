@@ -9,7 +9,7 @@ const articleFields = [
   { name: "slug", label: "Slug", type: "text" as const, required: true },
   { name: "author", label: "Author", type: "text" as const, required: true },
   { name: "authored_on", label: "Date", type: "date" as const, required: true },
-  { name: "media_id", label: "Featured Image", type: "media" as const },
+  { name: "media_id", label: "Featured Media", type: "media" as const },
   { name: "body", label: "Content", type: "textarea" as const, required: true },
   { name: "published", label: "Published", type: "checkbox" as const },
 ];

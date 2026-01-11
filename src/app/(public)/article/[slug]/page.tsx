@@ -1,8 +1,10 @@
 import { getDB } from "@/lib/db";
 import { getSessionUser } from "@/lib/session";
+import { getCustomerSubdomain } from "@/lib/stream";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ResponsiveImageContainer } from "@/components/ResponsiveImage";
+import StreamPlayer from "@/components/StreamPlayer";
 import { getImageUrl } from "@/lib/image";
 import type { Metadata } from "next";
 
@@ -25,6 +27,10 @@ interface Article {
   media_alt?: string;
   media_width?: number;
   media_height?: number;
+  media_type?: "image" | "video";
+  media_stream_uid?: string;
+  media_thumbnail_url?: string;
+  media_stream_status?: string;
   updated_at: string;
   tags?: Tag[];
 }
@@ -35,7 +41,10 @@ async function getArticle(slug: string): Promise<Article | null> {
     const article = await db
       .prepare(
         `SELECT a.*, m.path as media_path, m.alt as media_alt,
-                m.width as media_width, m.height as media_height
+                m.width as media_width, m.height as media_height,
+                m.type as media_type, m.stream_uid as media_stream_uid,
+                m.thumbnail_url as media_thumbnail_url,
+                m.stream_status as media_stream_status
          FROM articles a
          LEFT JOIN media m ON a.media_id = m.id
          WHERE a.slug = ? AND a.published = 1`
@@ -78,14 +87,17 @@ export async function generateMetadata({
   const url = `https://peabod.com/article/${slug}`;
 
   // Generate OG image URL (1200x630 is the standard for social sharing)
-  const ogImage = article.media_path
-    ? getImageUrl(article.media_path, {
-        width: 1200,
-        height: 630,
-        fit: "cover",
-        quality: 70,
-      })
-    : undefined;
+  // For videos, use the thumbnail; for images, use the image path
+  const ogImage = article.media_type === "video" && article.media_thumbnail_url
+    ? article.media_thumbnail_url
+    : article.media_path
+      ? getImageUrl(article.media_path, {
+          width: 1200,
+          height: 630,
+          fit: "cover",
+          quality: 70,
+        })
+      : undefined;
 
   return {
     title: article.title,
@@ -132,6 +144,8 @@ export default async function ArticlePage({
   }
 
   const canEdit = user && (user.role === "admin" || user.role === "editor");
+  const isVideo = article.media_type === "video";
+  const customerSubdomain = isVideo ? getCustomerSubdomain() : null;
 
   const formattedDate = new Date(article.authored_on).toLocaleDateString(
     "en-US",
@@ -184,15 +198,33 @@ export default async function ArticlePage({
         )}
       </header>
 
-      {article.media_path && (
+      {/* Featured Media - Image or Video */}
+      {article.media_id && (
         <figure className="mb-8">
-          <ResponsiveImageContainer
-            path={article.media_path}
-            alt={article.media_alt || article.title}
-            preset="hero"
-            priority
-            containerClassName="rounded-lg shadow-md"
-          />
+          {isVideo && article.media_stream_uid && article.media_stream_status === "ready" && customerSubdomain ? (
+            <StreamPlayer
+              uid={article.media_stream_uid}
+              customerSubdomain={customerSubdomain}
+              title={article.title}
+              poster={article.media_thumbnail_url || undefined}
+              controls
+              className="rounded-lg shadow-md overflow-hidden"
+            />
+          ) : isVideo ? (
+            <div className="aspect-video bg-gray-100 rounded-lg shadow-md flex items-center justify-center">
+              <span className="text-gray-500">
+                {article.media_stream_status === "processing" ? "Video processing..." : "Video not available"}
+              </span>
+            </div>
+          ) : article.media_path ? (
+            <ResponsiveImageContainer
+              path={article.media_path}
+              alt={article.media_alt || article.title}
+              preset="hero"
+              priority
+              containerClassName="rounded-lg shadow-md"
+            />
+          ) : null}
         </figure>
       )}
 

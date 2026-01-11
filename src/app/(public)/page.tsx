@@ -21,6 +21,8 @@ interface Article {
   media_alt?: string;
   media_width?: number;
   media_height?: number;
+  media_type?: "image" | "video";
+  media_thumbnail_url?: string;
   tags?: Tag[];
 }
 
@@ -30,7 +32,8 @@ async function getArticles(): Promise<Article[]> {
     const { results } = await db
       .prepare(
         `SELECT a.*, m.path as media_path, m.alt as media_alt,
-                m.width as media_width, m.height as media_height
+                m.width as media_width, m.height as media_height,
+                m.type as media_type, m.thumbnail_url as media_thumbnail_url
          FROM articles a
          LEFT JOIN media m ON a.media_id = m.id
          WHERE a.published = 1

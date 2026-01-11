@@ -8,10 +8,11 @@ interface UpdatePageBody {
   body?: string;
   author?: string;
   authored_on?: string;
+  media_id?: number | null;
   published?: boolean;
 }
 
-// GET /api/pages/[id] - Get single page
+// GET /api/pages/[id] - Get single page with media data
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -25,19 +26,76 @@ export async function GET(
 
     const isNumeric = /^\d+$/.test(id);
     const query = isNumeric
-      ? "SELECT * FROM pages WHERE id = ?"
-      : "SELECT * FROM pages WHERE slug = ?";
+      ? `SELECT p.*,
+                m.id as media_id_resolved,
+                m.path as media_path,
+                m.alt as media_alt,
+                m.title as media_title,
+                m.width as media_width,
+                m.height as media_height,
+                m.type as media_type,
+                m.stream_uid as media_stream_uid,
+                m.duration as media_duration,
+                m.thumbnail_url as media_thumbnail_url,
+                m.stream_status as media_stream_status
+         FROM pages p
+         LEFT JOIN media m ON p.media_id = m.id
+         WHERE p.id = ?`
+      : `SELECT p.*,
+                m.id as media_id_resolved,
+                m.path as media_path,
+                m.alt as media_alt,
+                m.title as media_title,
+                m.width as media_width,
+                m.height as media_height,
+                m.type as media_type,
+                m.stream_uid as media_stream_uid,
+                m.duration as media_duration,
+                m.thumbnail_url as media_thumbnail_url,
+                m.stream_status as media_stream_status
+         FROM pages p
+         LEFT JOIN media m ON p.media_id = m.id
+         WHERE p.slug = ?`;
 
-    const page = await db.prepare(query).bind(isNumeric ? parseInt(id) : id).first();
+    const result = await db.prepare(query).bind(isNumeric ? parseInt(id) : id).first();
 
-    if (!page) {
+    if (!result) {
       return NextResponse.json(
         { success: false, error: "Page not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ success: true, data: page });
+    const p = result as Record<string, unknown>;
+
+    // Build media object if media_id exists
+    const media = p.media_id
+      ? {
+          id: p.media_id_resolved,
+          path: p.media_path,
+          alt: p.media_alt,
+          title: p.media_title,
+          width: p.media_width,
+          height: p.media_height,
+          type: p.media_type,
+          stream_uid: p.media_stream_uid,
+          duration: p.media_duration,
+          thumbnail_url: p.media_thumbnail_url,
+          stream_status: p.media_stream_status,
+        }
+      : null;
+
+    // Remove the joined media fields from page object
+    const {
+      media_id_resolved: _mid, media_path: _mp, media_alt: _ma, media_title: _mt,
+      media_width: _mw, media_height: _mh, media_type: _mtype, media_stream_uid: _msu,
+      media_duration: _md, media_thumbnail_url: _mtu, media_stream_status: _mss,
+      ...pageData
+    } = p;
+    void _mid; void _mp; void _ma; void _mt; void _mw; void _mh;
+    void _mtype; void _msu; void _md; void _mtu; void _mss;
+
+    return NextResponse.json({ success: true, data: { ...pageData, media } });
   } catch (error) {
     console.error("Error fetching page:", error);
     return NextResponse.json(
@@ -74,7 +132,7 @@ export async function PUT(
     if (!auth.authorized) return auth.response;
 
     const updates: string[] = [];
-    const values: (string | number)[] = [];
+    const values: (string | number | null)[] = [];
 
     if (body.slug !== undefined) {
       updates.push("slug = ?");
@@ -95,6 +153,10 @@ export async function PUT(
     if (body.authored_on !== undefined) {
       updates.push("authored_on = ?");
       values.push(body.authored_on);
+    }
+    if (body.media_id !== undefined) {
+      updates.push("media_id = ?");
+      values.push(body.media_id);
     }
     if (body.published !== undefined) {
       updates.push("published = ?");

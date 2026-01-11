@@ -49,7 +49,11 @@ export async function GET(
                 m.lat as media_lat,
                 m.lon as media_lon,
                 m.date_taken as media_date_taken,
-                m.type as media_type
+                m.type as media_type,
+                m.stream_uid as media_stream_uid,
+                m.duration as media_duration,
+                m.thumbnail_url as media_thumbnail_url,
+                m.stream_status as media_stream_status
          FROM articles a
          LEFT JOIN media m ON a.media_id = m.id
          WHERE a.id = ?`
@@ -66,7 +70,11 @@ export async function GET(
                 m.lat as media_lat,
                 m.lon as media_lon,
                 m.date_taken as media_date_taken,
-                m.type as media_type
+                m.type as media_type,
+                m.stream_uid as media_stream_uid,
+                m.duration as media_duration,
+                m.thumbnail_url as media_thumbnail_url,
+                m.stream_status as media_stream_status
          FROM articles a
          LEFT JOIN media m ON a.media_id = m.id
          WHERE a.slug = ?`;
@@ -106,6 +114,10 @@ export async function GET(
           lon: result.media_lon,
           date_taken: result.media_date_taken,
           type: result.media_type,
+          stream_uid: result.media_stream_uid,
+          duration: result.media_duration,
+          thumbnail_url: result.media_thumbnail_url,
+          stream_status: result.media_stream_status,
         }
       : null;
 
@@ -113,9 +125,11 @@ export async function GET(
     const {
       media_id_resolved: _1, media_path: _2, media_alt: _3, media_title: _4, media_width: _5,
       media_height: _6, media_filename: _7, media_mime_type: _8, media_size: _9, media_lat: _10,
-      media_lon: _11, media_date_taken: _12, media_type: _13, ...articleData
+      media_lon: _11, media_date_taken: _12, media_type: _13, media_stream_uid: _14,
+      media_duration: _15, media_thumbnail_url: _16, media_stream_status: _17,
+      ...articleData
     } = result;
-    void [_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13];
+    void [_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17];
 
     return NextResponse.json({
       success: true,

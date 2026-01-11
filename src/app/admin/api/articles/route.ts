@@ -22,7 +22,12 @@ export async function GET(request: NextRequest) {
              m.alt as media_alt,
              m.title as media_title,
              m.width as media_width,
-             m.height as media_height
+             m.height as media_height,
+             m.type as media_type,
+             m.stream_uid as media_stream_uid,
+             m.duration as media_duration,
+             m.thumbnail_url as media_thumbnail_url,
+             m.stream_status as media_stream_status
       FROM articles a
       LEFT JOIN media m ON a.media_id = m.id
     `;
@@ -60,15 +65,23 @@ export async function GET(request: NextRequest) {
               title: art.media_title,
               width: art.media_width,
               height: art.media_height,
+              type: art.media_type,
+              stream_uid: art.media_stream_uid,
+              duration: art.media_duration,
+              thumbnail_url: art.media_thumbnail_url,
+              stream_status: art.media_stream_status,
             }
           : null;
 
         // Remove the joined media fields from article object
         const {
           media_id_resolved: _mid, media_path: _mp, media_alt: _ma, media_title: _mt,
-          media_width: _mw, media_height: _mh, ...articleData
+          media_width: _mw, media_height: _mh, media_type: _mtype, media_stream_uid: _msu,
+          media_duration: _md, media_thumbnail_url: _mtu, media_stream_status: _mss,
+          ...articleData
         } = art;
         void _mid; void _mp; void _ma; void _mt; void _mw; void _mh;
+        void _mtype; void _msu; void _md; void _mtu; void _mss;
 
         return { ...articleData, tags: tags || [], media };
       })

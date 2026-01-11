@@ -18,6 +18,8 @@ interface ArticleCardProps {
   media_alt?: string;
   media_width?: number;
   media_height?: number;
+  media_type?: "image" | "video";
+  media_thumbnail_url?: string;
   tags?: Tag[];
   isAdmin?: boolean;
   /** Set to true for above-the-fold images (LCP optimization) */
@@ -33,10 +35,13 @@ export default function ArticleCard({
   body,
   media_path,
   media_alt,
+  media_type,
+  media_thumbnail_url,
   tags,
   isAdmin,
   priority = false,
 }: ArticleCardProps) {
+  const isVideo = media_type === "video";
   const excerpt = body.length > 200 ? body.substring(0, 200) + "..." : body;
   const formattedDate = new Date(authored_on).toLocaleDateString("en-US", {
     year: "numeric",
@@ -52,16 +57,36 @@ export default function ArticleCard({
         borderColor: "var(--border)",
       }}
     >
-      {media_path && (
-        <Link href={`/article/${slug}`} className="block">
-          <ResponsiveImageContainer
-            path={media_path}
-            alt={media_alt || title}
-            preset="card"
-            aspectRatio="auto"
-            containerClassName="h-48 w-full"
-            priority={priority}
-          />
+      {/* Featured Media - Image or Video Thumbnail */}
+      {(media_path || (isVideo && media_thumbnail_url)) && (
+        <Link href={`/article/${slug}`} className="block relative">
+          {isVideo && media_thumbnail_url ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={media_thumbnail_url}
+                alt={media_alt || title}
+                className="h-48 w-full object-cover"
+              />
+              {/* Play button overlay */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-14 h-14 bg-black bg-opacity-60 rounded-full flex items-center justify-center">
+                  <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </div>
+            </>
+          ) : media_path ? (
+            <ResponsiveImageContainer
+              path={media_path}
+              alt={media_alt || title}
+              preset="card"
+              aspectRatio="auto"
+              containerClassName="h-48 w-full"
+              priority={priority}
+            />
+          ) : null}
         </Link>
       )}
       <div className="p-6">
