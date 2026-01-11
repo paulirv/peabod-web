@@ -100,3 +100,7 @@ Follow the workflow documented in `docs/GIT-WORKFLOW.md`.
 ## Troubleshooting
 
 Check `docs/LESSONS-LEARNED.md` for documented solutions to past problems.
+
+## Future Plans
+
+Future plans and planning ideas are documented in `docs/FUTURE-PLANS.md`. When discussing or proposing new features, enhancements, or architectural changes, write them to that file.
