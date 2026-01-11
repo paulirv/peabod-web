@@ -620,6 +620,9 @@ export default function MediaMetadataEditor({
           {/* Read-only info */}
           <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600">
             <p>
+              <span className="font-medium">ID:</span> {media?.id}
+            </p>
+            <p>
               <span className="font-medium">Filename:</span> {media?.filename}
             </p>
             <p>
