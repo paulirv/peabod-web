@@ -21,6 +21,13 @@ bucket_name = "peabod"
 
 [vars]
 ENVIRONMENT = "production"
+# Cloudflare account ID (same as account_id above)
+CF_ACCOUNT_ID = "bb4c9b919e317b42c003591ab2cc4ecd"
+# Stream customer subdomain (find in Cloudflare dashboard under Stream)
+STREAM_CUSTOMER_SUBDOMAIN = "customer-XXXXX"
+
+# Secrets (add via: wrangler secret put CF_API_TOKEN)
+# CF_API_TOKEN - Cloudflare API token with Stream:Edit permission
 
 # Custom domain routes
 [[routes]]

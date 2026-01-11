@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { ResponsiveImageContainer } from "@/components/ResponsiveImage";
 import MediaCard from "@/components/admin/MediaCard";
+import VideoUploader from "@/components/admin/VideoUploader";
+import VideoLinker from "@/components/admin/VideoLinker";
 import type { Media, MediaWithUsage, MediaUsageDetails } from "@/types/media";
 
 interface MediaResponse {
@@ -40,6 +42,8 @@ export default function MediaLibraryPage() {
   const [usageModal, setUsageModal] = useState<MediaWithUsage | null>(null);
   const [usageDetails, setUsageDetails] = useState<MediaUsageDetails | null>(null);
   const [loadingUsage, setLoadingUsage] = useState(false);
+  const [showVideoUpload, setShowVideoUpload] = useState(false);
+  const [showVideoLink, setShowVideoLink] = useState(false);
 
   // Table sorting (client-side for current page)
   const [tableSortField, setTableSortField] = useState<SortField>("created_at");
@@ -247,17 +251,29 @@ export default function MediaLibraryPage() {
 
           <label className="cursor-pointer">
             <span className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-              {uploading ? "Uploading..." : "Upload"}
+              {uploading ? "Uploading..." : "Upload Image"}
             </span>
             <input
               type="file"
-              accept="image/*,video/*"
+              accept="image/*"
               multiple
               onChange={handleFileUpload}
               disabled={uploading}
               className="hidden"
             />
           </label>
+          <button
+            onClick={() => setShowVideoUpload(true)}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+          >
+            Upload Video
+          </button>
+          <button
+            onClick={() => setShowVideoLink(true)}
+            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            Add Existing
+          </button>
         </div>
       </div>
 
@@ -636,6 +652,46 @@ export default function MediaLibraryPage() {
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video Upload Modal */}
+      {showVideoUpload && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Upload Video</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Videos are uploaded directly to Cloudflare Stream for transcoding and delivery.
+            </p>
+            <VideoUploader
+              onUploadComplete={() => {
+                setShowVideoUpload(false);
+                setPage(0);
+                fetchMedia();
+              }}
+              onCancel={() => setShowVideoUpload(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Video Link Modal */}
+      {showVideoLink && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Add Existing Video</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Link a video that already exists in your Cloudflare Stream account.
+            </p>
+            <VideoLinker
+              onLinkComplete={() => {
+                setShowVideoLink(false);
+                setPage(0);
+                fetchMedia();
+              }}
+              onCancel={() => setShowVideoLink(false)}
+            />
           </div>
         </div>
       )}

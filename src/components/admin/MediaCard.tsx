@@ -19,6 +19,12 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function formatDuration(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+}
+
 export default function MediaCard({
   media,
   selected = false,
@@ -42,15 +48,90 @@ export default function MediaCard({
       {/* Thumbnail */}
       <div className="aspect-square bg-gray-100 relative overflow-hidden">
         {isVideo ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
-            <svg
-              className="w-12 h-12 text-white opacity-75"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </div>
+          // Video thumbnail with Stream status
+          media.stream_status === "ready" && media.thumbnail_url ? (
+            <div className="absolute inset-0">
+              <img
+                src={media.thumbnail_url}
+                alt={media.alt || media.title}
+                className="w-full h-full object-cover"
+              />
+              {/* Play icon overlay */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-12 h-12 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                  <svg
+                    className="w-6 h-6 text-white ml-1"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </div>
+              {/* Duration badge */}
+              {media.duration && (
+                <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black bg-opacity-70 text-white text-xs rounded">
+                  {formatDuration(media.duration)}
+                </div>
+              )}
+            </div>
+          ) : media.stream_status === "processing" ||
+            media.stream_status === "uploading" ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-800">
+              <svg
+                className="animate-spin h-8 w-8 text-white mb-2"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+              <span className="text-xs text-white">
+                {media.stream_status === "uploading"
+                  ? "Uploading..."
+                  : "Processing..."}
+              </span>
+            </div>
+          ) : media.stream_status === "error" ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-900">
+              <svg
+                className="w-8 h-8 text-white mb-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span className="text-xs text-white">Error</span>
+            </div>
+          ) : (
+            // Default video placeholder (no stream_status)
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
+              <svg
+                className="w-12 h-12 text-white opacity-75"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          )
         ) : (
           <ResponsiveImageContainer
             path={media.path}

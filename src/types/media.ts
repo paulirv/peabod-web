@@ -1,5 +1,8 @@
 // Media types for Digital Asset Management
 
+// Video processing status for Cloudflare Stream
+export type StreamStatus = "uploading" | "processing" | "ready" | "error";
+
 export interface Media {
   id: number;
   title: string;
@@ -14,6 +17,13 @@ export interface Media {
   lon: number | null;
   date_taken: string | null;
   type: "image" | "video";
+  // Cloudflare Stream fields (for videos)
+  stream_uid: string | null;
+  duration: number | null;
+  thumbnail_url: string | null;
+  stream_status: StreamStatus | null;
+  stream_error: string | null;
+  stream_meta: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -31,6 +41,9 @@ export interface MediaCreateInput {
   lon?: number;
   date_taken?: string;
   type: "image" | "video";
+  // Stream fields for video
+  stream_uid?: string;
+  stream_status?: StreamStatus;
 }
 
 export interface MediaUpdateInput {

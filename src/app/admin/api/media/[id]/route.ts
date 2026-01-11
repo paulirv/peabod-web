@@ -2,6 +2,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { NextRequest, NextResponse } from "next/server";
 import { getDB } from "@/lib/db";
 import { requireAuthor, requireOwnerOrEditor } from "@/lib/api-auth";
+import { deleteVideo as deleteStreamVideo } from "@/lib/stream";
 import type { Media, MediaUpdateInput } from "@/types/media";
 
 function getR2Bucket(): R2Bucket {
@@ -180,8 +181,14 @@ export async function DELETE(
       );
     }
 
-    // Delete from R2
-    await bucket.delete(media.path);
+    // Delete from storage (R2 for images, Stream for videos)
+    if (media.stream_uid) {
+      // Video stored in Cloudflare Stream
+      await deleteStreamVideo(media.stream_uid);
+    } else {
+      // Image stored in R2
+      await bucket.delete(media.path);
+    }
 
     // Delete from database
     await db.prepare("DELETE FROM media WHERE id = ?").bind(parseInt(id)).run();
