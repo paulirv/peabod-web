@@ -7,6 +7,7 @@ interface MediaCardProps {
   media: Media;
   selected?: boolean;
   onSelect?: (media: Media) => void;
+  onView?: (media: Media) => void;
   onEdit?: (media: Media) => void;
   onDelete?: (media: Media) => void;
   inUse?: boolean;
@@ -29,6 +30,7 @@ export default function MediaCard({
   media,
   selected = false,
   onSelect,
+  onView,
   onEdit,
   onDelete,
   inUse = false,
@@ -193,6 +195,17 @@ export default function MediaCard({
 
         {/* Hover overlay with actions */}
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+          {onView && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onView(media);
+              }}
+              className="px-3 py-1.5 bg-blue-500 text-white rounded-md text-sm font-medium hover:bg-blue-600 transition-colors"
+            >
+              View
+            </button>
+          )}
           {onEdit && (
             <button
               onClick={(e) => {

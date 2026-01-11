@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { ResponsiveImageContainer } from "@/components/ResponsiveImage";
 import MediaCard from "@/components/admin/MediaCard";
+import MediaViewModal from "@/components/admin/MediaViewModal";
 import VideoUploader from "@/components/admin/VideoUploader";
 import VideoLinker from "@/components/admin/VideoLinker";
 import type { Media, MediaWithUsage, MediaUsageDetails } from "@/types/media";
@@ -45,8 +46,26 @@ export default function MediaLibraryPage() {
   const [showVideoUpload, setShowVideoUpload] = useState(false);
   const [showVideoLink, setShowVideoLink] = useState(false);
   const [showAddMenu, setShowAddMenu] = useState(false);
+  const [viewingMedia, setViewingMedia] = useState<Media | null>(null);
+  const [customerSubdomain, setCustomerSubdomain] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const addMenuRef = useRef<HTMLDivElement>(null);
+
+  // Fetch video config (customer subdomain) on mount
+  useEffect(() => {
+    async function fetchVideoConfig() {
+      try {
+        const res = await fetch("/admin/api/video/config");
+        const data = (await res.json()) as { success: boolean; data?: { customerSubdomain: string } };
+        if (data.success && data.data) {
+          setCustomerSubdomain(data.data.customerSubdomain);
+        }
+      } catch {
+        // Silently fail - videos just won't play
+      }
+    }
+    fetchVideoConfig();
+  }, []);
 
   // Close add menu when clicking outside
   useEffect(() => {
@@ -455,6 +474,7 @@ export default function MediaLibraryPage() {
             <MediaCard
               key={item.id}
               media={item}
+              onView={setViewingMedia}
               onEdit={setEditingMedia}
               onDelete={isInUse(item) ? undefined : (m) => setDeleteConfirm(m as MediaWithUsage)}
               inUse={isInUse(item)}
@@ -513,7 +533,11 @@ export default function MediaLibraryPage() {
               {sortedMedia.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
-                    <div className="w-16 h-12 bg-gray-100 rounded overflow-hidden relative">
+                    <button
+                      onClick={() => setViewingMedia(item)}
+                      className="w-16 h-12 bg-gray-100 rounded overflow-hidden relative block hover:ring-2 hover:ring-blue-500 transition-all"
+                      title="View media"
+                    >
                       {item.type === "video" ? (
                         <div className="w-full h-full flex items-center justify-center bg-gray-800">
                           <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -528,7 +552,7 @@ export default function MediaLibraryPage() {
                           containerClassName="w-full h-full"
                         />
                       )}
-                    </div>
+                    </button>
                   </td>
                   <td className="px-4 py-3">
                     <button
@@ -755,6 +779,15 @@ export default function MediaLibraryPage() {
             />
           </div>
         </div>
+      )}
+
+      {/* Media View Modal */}
+      {viewingMedia && (
+        <MediaViewModal
+          media={viewingMedia}
+          customerSubdomain={customerSubdomain || undefined}
+          onClose={() => setViewingMedia(null)}
+        />
       )}
     </div>
   );
