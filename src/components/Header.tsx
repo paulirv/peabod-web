@@ -14,9 +14,10 @@ interface User {
 
 interface HeaderProps {
   siteName?: string;
+  logoPath?: string | null;
 }
 
-export default function Header({ siteName }: HeaderProps) {
+export default function Header({ siteName, logoPath }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [userLoading, setUserLoading] = useState(true);
@@ -87,10 +88,18 @@ export default function Header({ siteName }: HeaderProps) {
           <nav className="flex items-center justify-between">
             <Link
               href="/"
-              className="text-2xl font-bold"
+              className="text-2xl font-bold flex items-center"
               style={{ color: "var(--foreground)" }}
             >
-              {siteName || "Site Name"}
+              {logoPath ? (
+                <img
+                  src={`/api/media/${logoPath}?h=40`}
+                  alt={siteName || "Site Name"}
+                  className="h-10 w-auto"
+                />
+              ) : (
+                siteName || "Site Name"
+              )}
             </Link>
 
             <div className="relative" ref={menuRef}>

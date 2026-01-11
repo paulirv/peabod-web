@@ -6,6 +6,7 @@ export interface PublicSettings {
   site_url: string | null;
   meta_title_suffix: string | null;
   site_icon_path: string | null;
+  logo_path: string | null;
   copyright_text: string | null;
   social_twitter: string | null;
   social_facebook: string | null;
@@ -30,6 +31,7 @@ export async function getPublicSettings(): Promise<PublicSettings | null> {
           s.site_url,
           s.meta_title_suffix,
           icon.path as site_icon_path,
+          logo.path as logo_path,
           s.copyright_text,
           s.social_twitter,
           s.social_facebook,
@@ -40,6 +42,7 @@ export async function getPublicSettings(): Promise<PublicSettings | null> {
           s.social_substack
         FROM settings s
         LEFT JOIN media icon ON s.site_icon_id = icon.id
+        LEFT JOIN media logo ON s.logo_media_id = logo.id
         WHERE s.id = 1
       `)
       .first<PublicSettings>();
