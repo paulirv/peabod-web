@@ -83,7 +83,7 @@ export default function TagsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Tags</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Tags</h1>
 
       <div className="bg-white rounded-lg p-6 border border-gray-200 mb-6">
         <h2 className="text-lg font-semibold mb-4">Add New Tag</h2>

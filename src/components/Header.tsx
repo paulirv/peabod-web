@@ -12,7 +12,11 @@ interface User {
   is_superadmin: boolean;
 }
 
-export default function Header() {
+interface HeaderProps {
+  siteName?: string;
+}
+
+export default function Header({ siteName }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [userLoading, setUserLoading] = useState(true);
@@ -79,14 +83,14 @@ export default function Header() {
           borderColor: "var(--border)",
         }}
       >
-        <div className="max-w-4xl mx-auto px-4 py-6">
+        <div className="max-w-4xl mx-auto px-2 py-4">
           <nav className="flex items-center justify-between">
             <Link
               href="/"
               className="text-2xl font-bold"
               style={{ color: "var(--foreground)" }}
             >
-              Peabod
+              {siteName || "Site Name"}
             </Link>
 
             <div className="relative" ref={menuRef}>

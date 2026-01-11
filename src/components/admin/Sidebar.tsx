@@ -18,13 +18,15 @@ const navItems: NavItem[] = [
   { href: "/admin/media", label: "Media", icon: "M" },
   { href: "/admin/tags", label: "Tags", icon: "T" },
   { href: "/admin/users", label: "Users", icon: "U", adminOnly: true },
+  { href: "/admin/settings", label: "Settings", icon: "S", adminOnly: true },
 ];
 
 interface SidebarProps {
   userRole?: UserRole;
+  siteName?: string;
 }
 
-export default function Sidebar({ userRole }: SidebarProps) {
+export default function Sidebar({ userRole, siteName }: SidebarProps) {
   const pathname = usePathname();
 
   const visibleItems = navItems.filter(
@@ -56,7 +58,7 @@ export default function Sidebar({ userRole }: SidebarProps) {
         </svg>
       </Link>
       <div className="mb-8">
-        <h1 className="text-xl font-bold">Peabod CMS</h1>
+        <h1 className="text-xl font-bold">{siteName || "Site Name"}</h1>
         <p className="text-gray-400 text-sm">Content Management</p>
       </div>
       <nav>
