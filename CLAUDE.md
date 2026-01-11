@@ -462,6 +462,8 @@ Agents are specialized assistants that combine expertise with relevant skills.
 | `npx @opennextjs/cloudflare build` | Build for Cloudflare deployment |
 | `npx wrangler deploy` | Deploy to Cloudflare Workers |
 | `wrangler d1 execute peabod-db --file=./schema.sql` | Apply database schema |
+| `wrangler d1 export peabod-db --remote --output=db-backup.sql` | Export remote database |
+| `wrangler d1 execute peabod-db --local --file=db-backup.sql` | Import to local database |
 
 ### Available Integrations
 
@@ -531,6 +533,33 @@ Schema in `schema.sql`. Migrations in `migrations/`.
 ```bash
 wrangler d1 execute peabod-db --file=./schema.sql
 ```
+
+### Sync Local Database from Remote
+
+To sync your local D1 database with production data:
+
+```bash
+# Step 1: Export data from remote database
+wrangler d1 export peabod-db --remote --output=db-backup.sql
+
+# Step 2: Clear local database and import
+rm -rf .wrangler/state/v3/d1
+wrangler d1 execute peabod-db --local --command="SELECT 1"  # Initialize empty DB
+DB_FILE=$(find .wrangler/state/v3/d1 -name "*.sqlite" | head -1)
+sqlite3 "$DB_FILE" < db-backup.sql
+
+# Step 3: Clean up backup file
+rm db-backup.sql
+```
+
+> **Note:** This overwrites your local database with remote data. Any local changes will be lost. The backup file contains full SQL statements including schema and data.
+>
+> **Workaround:** The `wrangler d1 execute --local --file` command has a bug with FileHandle in older versions. The sqlite3 direct import above works reliably.
+
+**When to sync:**
+- Before local development to test with real data
+- After deploying schema changes to verify migrations work correctly
+- When debugging production issues locally
 
 ---
 

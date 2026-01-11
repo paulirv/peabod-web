@@ -88,11 +88,27 @@ export default function Sidebar({ userRole, siteName }: SidebarProps) {
           })}
         </ul>
       </nav>
-      {userRole && (
-        <div className="mt-8 px-4 py-2 text-xs text-gray-500">
-          Logged in as {userRole}
-        </div>
-      )}
+      {/* Account link and user info at bottom */}
+      <div className="mt-8 border-t border-gray-700 pt-4">
+        <Link
+          href="/admin/account"
+          className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
+            pathname === "/admin/account"
+              ? "bg-blue-600 text-white"
+              : "text-gray-300 hover:bg-gray-800"
+          }`}
+        >
+          <span className="w-6 h-6 flex items-center justify-center bg-gray-700 rounded text-sm">
+            @
+          </span>
+          My Account
+        </Link>
+        {userRole && (
+          <div className="mt-3 px-4 py-2 text-xs text-gray-500">
+            Logged in as {userRole}
+          </div>
+        )}
+      </div>
     </aside>
   );
 }
