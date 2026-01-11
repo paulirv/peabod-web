@@ -82,16 +82,12 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   // Add default OG image if configured
+  // Use direct URL (not cdn-cgi transform) for better crawler compatibility
   if (settings?.default_og_image_path) {
-    const ogImageUrl = getImageUrl(settings.default_og_image_path, {
-      width: 1200,
-      height: 630,
-      fit: 'cover',
-      quality: 80,
-    });
+    const ogImageUrl = `${siteUrl}/api/media/${settings.default_og_image_path}`;
     metadata.openGraph = {
       ...metadata.openGraph,
-      images: [{ url: ogImageUrl, width: 1200, height: 630 }],
+      images: [{ url: ogImageUrl }],
     };
     metadata.twitter = {
       ...metadata.twitter,
