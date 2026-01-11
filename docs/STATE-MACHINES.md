@@ -399,11 +399,11 @@ flowchart TB
     end
 
     subgraph "API Layer"
-        AuthAPI[/api/auth/*]
-        MediaAPI[/admin/api/media/*]
-        ArticlesAPI[/admin/api/articles/*]
-        UsersAPI[/admin/api/users/*]
-        TagsAPI[/admin/api/tags/*]
+        AuthAPI["/api/auth/*"]
+        MediaAPI["/admin/api/media/*"]
+        ArticlesAPI["/admin/api/articles/*"]
+        UsersAPI["/admin/api/users/*"]
+        TagsAPI["/admin/api/tags/*"]
     end
 
     ThemeProvider --> MediaPage
