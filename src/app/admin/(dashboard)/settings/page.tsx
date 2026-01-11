@@ -204,6 +204,23 @@ export default function SettingsPage() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
+                Site Icon (Favicon) Media ID
+              </label>
+              <input
+                type="number"
+                value={settings.site_icon_id || ""}
+                onChange={(e) => updateField("site_icon_id", e.target.value ? parseInt(e.target.value) : null)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white"
+                placeholder="Media ID"
+              />
+              {settings.site_icon_path && (
+                <p className="text-xs text-gray-500 mt-1">Current: {settings.site_icon_path}</p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">Browser tab icon. For best results, use a square image (recommended: 512x512 PNG).</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Logo Media ID
               </label>
               <input

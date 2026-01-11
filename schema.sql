@@ -134,6 +134,7 @@ CREATE TABLE IF NOT EXISTS settings (
   meta_title_suffix TEXT,  -- Appended to page titles (e.g., " | Peabod")
   default_og_image_id INTEGER REFERENCES media(id) ON DELETE SET NULL,
   -- Display
+  site_icon_id INTEGER REFERENCES media(id) ON DELETE SET NULL,
   logo_media_id INTEGER REFERENCES media(id) ON DELETE SET NULL,
   copyright_text TEXT,
   -- Content settings

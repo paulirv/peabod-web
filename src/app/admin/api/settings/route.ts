@@ -13,6 +13,8 @@ export interface SiteSettings {
   default_og_image_id: number | null;
   default_og_image_path?: string | null;
   // Display
+  site_icon_id: number | null;
+  site_icon_path?: string | null;
   logo_media_id: number | null;
   logo_path?: string | null;
   copyright_text: string | null;
@@ -46,9 +48,11 @@ export async function GET() {
         SELECT
           s.*,
           og.path as default_og_image_path,
+          icon.path as site_icon_path,
           logo.path as logo_path
         FROM settings s
         LEFT JOIN media og ON s.default_og_image_id = og.id
+        LEFT JOIN media icon ON s.site_icon_id = icon.id
         LEFT JOIN media logo ON s.logo_media_id = logo.id
         WHERE s.id = 1
       `)
@@ -79,6 +83,7 @@ interface UpdateSettingsBody {
   site_description?: string | null;
   meta_title_suffix?: string | null;
   default_og_image_id?: number | null;
+  site_icon_id?: number | null;
   logo_media_id?: number | null;
   copyright_text?: string | null;
   posts_per_page?: number;
@@ -111,6 +116,7 @@ export async function PUT(request: NextRequest) {
       "site_description",
       "meta_title_suffix",
       "default_og_image_id",
+      "site_icon_id",
       "logo_media_id",
       "copyright_text",
       "posts_per_page",
@@ -151,9 +157,11 @@ export async function PUT(request: NextRequest) {
         SELECT
           s.*,
           og.path as default_og_image_path,
+          icon.path as site_icon_path,
           logo.path as logo_path
         FROM settings s
         LEFT JOIN media og ON s.default_og_image_id = og.id
+        LEFT JOIN media icon ON s.site_icon_id = icon.id
         LEFT JOIN media logo ON s.logo_media_id = logo.id
         WHERE s.id = 1
       `)

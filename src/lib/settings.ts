@@ -5,6 +5,7 @@ export interface PublicSettings {
   site_description: string | null;
   site_url: string | null;
   meta_title_suffix: string | null;
+  site_icon_path: string | null;
   copyright_text: string | null;
   social_twitter: string | null;
   social_facebook: string | null;
@@ -24,20 +25,22 @@ export async function getPublicSettings(): Promise<PublicSettings | null> {
     const settings = await db
       .prepare(`
         SELECT
-          site_name,
-          site_description,
-          site_url,
-          meta_title_suffix,
-          copyright_text,
-          social_twitter,
-          social_facebook,
-          social_instagram,
-          social_linkedin,
-          social_youtube,
-          social_github,
-          social_substack
-        FROM settings
-        WHERE id = 1
+          s.site_name,
+          s.site_description,
+          s.site_url,
+          s.meta_title_suffix,
+          icon.path as site_icon_path,
+          s.copyright_text,
+          s.social_twitter,
+          s.social_facebook,
+          s.social_instagram,
+          s.social_linkedin,
+          s.social_youtube,
+          s.social_github,
+          s.social_substack
+        FROM settings s
+        LEFT JOIN media icon ON s.site_icon_id = icon.id
+        WHERE s.id = 1
       `)
       .first<PublicSettings>();
 
