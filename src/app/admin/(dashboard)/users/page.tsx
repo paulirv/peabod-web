@@ -25,6 +25,13 @@ export default function UsersPage() {
   const [search, setSearch] = useState("");
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [saving, setSaving] = useState(false);
+  const [showNewUserModal, setShowNewUserModal] = useState(false);
+  const [newUser, setNewUser] = useState({
+    email: "",
+    password: "",
+    name: "",
+    role: "author" as UserRole,
+  });
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -186,6 +193,37 @@ export default function UsersPage() {
     }
   };
 
+  const handleCreateUser = async () => {
+    if (!newUser.email || !newUser.password || !newUser.name) {
+      alert("Please fill in all required fields");
+      return;
+    }
+    if (newUser.password.length < 8) {
+      alert("Password must be at least 8 characters");
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch("/admin/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUser),
+      });
+      if (res.ok) {
+        setShowNewUserModal(false);
+        setNewUser({ email: "", password: "", name: "", role: "author" });
+        fetchUsers();
+      } else {
+        const data = (await res.json()) as { error?: string };
+        alert(data.error || "Failed to create user");
+      }
+    } catch (error) {
+      console.error("Error creating user:", error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const getStatusBadge = (user: User) => {
     if (!user.is_active) {
       return (
@@ -216,11 +254,19 @@ export default function UsersPage() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Users</h1>
-        {pendingCount > 0 && (
-          <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
-            {pendingCount} pending approval
-          </span>
-        )}
+        <div className="flex items-center gap-3">
+          {pendingCount > 0 && (
+            <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+              {pendingCount} pending approval
+            </span>
+          )}
+          <button
+            onClick={() => setShowNewUserModal(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            + New User
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -434,6 +480,83 @@ export default function UsersPage() {
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
               >
                 {saving ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* New User Modal */}
+      {showNewUserModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-lg font-semibold mb-4">New User</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white"
+                  placeholder="user@example.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Password <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white"
+                  placeholder="Minimum 8 characters"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={newUser.name}
+                  onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white"
+                  placeholder="Full name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                <select
+                  value={newUser.role}
+                  onChange={(e) => setNewUser({ ...newUser, role: e.target.value as UserRole })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white"
+                >
+                  <option value="author">Author</option>
+                  <option value="editor">Editor</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowNewUserModal(false);
+                  setNewUser({ email: "", password: "", name: "", role: "author" });
+                }}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateUser}
+                disabled={saving}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
+                {saving ? "Creating..." : "Create User"}
               </button>
             </div>
           </div>
