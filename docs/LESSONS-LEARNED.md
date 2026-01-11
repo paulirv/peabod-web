@@ -89,3 +89,47 @@ xhr.send(formData);
 **Bonus:** Removing tus-js-client reduced the page bundle size by ~21kB.
 
 ---
+
+## Dynamic Favicon with generateMetadata
+
+**Date:** 2026-01-10
+
+**Problem:** Needed to serve a dynamic favicon from the database (via site settings) instead of using static favicon files.
+
+**Solution:** Convert the root layout from static metadata export to a `generateMetadata()` function that fetches settings at request time:
+
+```typescript
+// src/app/layout.tsx
+import { getPublicSettings } from "@/lib/settings";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getPublicSettings();
+
+  const metadata: Metadata = {
+    title: settings?.site_name || "Site Name",
+    description: settings?.site_description || "",
+    // ...
+  };
+
+  if (settings?.site_icon_path) {
+    metadata.icons = {
+      icon: `/api/media/${settings.site_icon_path}`,
+      apple: `/api/media/${settings.site_icon_path}`,
+    };
+  }
+
+  return metadata;
+}
+```
+
+**Key Insights:**
+- `generateMetadata()` runs on the server for each request, allowing dynamic values
+- Icons can point to API routes that serve media from R2 or other storage
+- For best favicon results, use a square image (recommended: 512x512 PNG)
+- Build-time warnings about `getCloudflareContext` during static generation are expected and don't affect runtime
+
+**Related Files:**
+- `src/app/layout.tsx` - Root layout with generateMetadata
+- `src/lib/settings.ts` - Public settings helper with site_icon_path
+
+---
