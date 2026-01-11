@@ -97,6 +97,22 @@ Follow the workflow documented in `docs/GIT-WORKFLOW.md`.
 - Do NOT include `Co-Authored-By` lines in commit messages
 - Keep subject lines under 72 characters, use imperative mood
 
+## Project Workflow
+
+When starting work on a new feature, fix, or refactor:
+
+1. **Checkout a new branch** following the naming convention (`feature/*`, `fix/*`, `refactor/*`)
+2. **Create `progress.txt`** in the project root to track progress on that branch
+3. **Create `findings.txt`** in the project root to document lessons learned during development
+4. **Consult experts** - Use the Drupal expert and code expert agents for guidance and best practices
+5. **Create tests** - Write tests for new features to ensure functionality and prevent regressions
+
+After the branch has been merged into main:
+- Add any valuable findings from `findings.txt` to `docs/LESSONS-LEARNED.md`
+- The branch-specific `progress.txt` and `findings.txt` can be deleted
+
+**Note:** Documentation branches (`docs/*`) do not require `progress.txt` or `findings.txt` files.
+
 ## Troubleshooting
 
 Check `docs/LESSONS-LEARNED.md` for documented solutions to past problems.
