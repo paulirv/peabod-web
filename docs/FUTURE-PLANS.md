@@ -49,3 +49,15 @@ Potential future improvements to video support:
 - Video chapters/markers
 - Bulk video upload queue
 - Webhook handler for Stream notifications (currently using polling)
+
+---
+
+## Dashboard Enhancements
+
+Improve the admin dashboard with better overview and quick actions.
+
+---
+
+## Menu Manager
+
+Add a menu management system to allow creating and organizing navigation menus.
