@@ -1,0 +1,24 @@
+# Findings: fix/github-issues-4-5-6
+
+## Technical Decisions
+
+### Middleware for www Redirect
+- Used Next.js middleware for the redirect instead of Cloudflare rules
+- This keeps the redirect logic in the codebase rather than infrastructure
+- 301 permanent redirect used for SEO benefits
+- Expanded matcher pattern to handle all routes, not just /admin
+
+### Footer as Client Component
+- Changed Footer from server component to client component
+- Required for theme picker state management and click-outside handling
+- Uses the same `useTheme` hook pattern as the original Header implementation
+
+### Auto-generated Copyright
+- Format: "© [year] [siteName]. All rights reserved."
+- Year is dynamically generated using `new Date().getFullYear()`
+- Site name falls back to "Site Name" if not set in settings
+- Matches the format specified in issue #5
+
+## No Migration Needed
+- The `copyright_text` column remains in the database schema but is no longer used
+- Decided not to add a migration to remove the column as it causes no harm and could break existing data if someone needs to rollback

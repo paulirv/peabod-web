@@ -251,18 +251,6 @@ export default function SettingsPage() {
               <p className="text-xs text-gray-500 mt-1">When a logo is set, optionally display the site name alongside it.</p>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Copyright Text
-              </label>
-              <input
-                type="text"
-                value={settings.copyright_text || ""}
-                onChange={(e) => updateField("copyright_text", e.target.value || null)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white"
-                placeholder="© 2026 My Website. All rights reserved."
-              />
-            </div>
           </div>
         </section>
 

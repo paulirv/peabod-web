@@ -8,7 +8,6 @@ export interface PublicSettings {
   site_icon_path: string | null;
   logo_path: string | null;
   logo_text_display: string | null;  // 'none', 'after', 'below'
-  copyright_text: string | null;
   social_twitter: string | null;
   social_facebook: string | null;
   social_instagram: string | null;
@@ -34,7 +33,6 @@ export async function getPublicSettings(): Promise<PublicSettings | null> {
           icon.path as site_icon_path,
           logo.path as logo_path,
           s.logo_text_display,
-          s.copyright_text,
           s.social_twitter,
           s.social_facebook,
           s.social_instagram,

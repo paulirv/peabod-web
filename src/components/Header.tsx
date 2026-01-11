@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useTheme } from "./ThemeProvider";
 
 interface User {
   id: number;
@@ -25,10 +24,6 @@ export default function Header({ siteName, logoPath, logoTextDisplay }: HeaderPr
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  const { theme, setTheme, themes } = useTheme();
-  const lightThemes = themes.filter((t) => !t.isDark);
-  const darkThemes = themes.filter((t) => t.isDark);
 
   useEffect(() => {
     fetchUser();
@@ -181,121 +176,6 @@ export default function Header({ siteName, logoPath, logoTextDisplay }: HeaderPr
                       </svg>
                       About
                     </Link>
-                  </div>
-
-                  {/* Divider */}
-                  <div style={{ borderTop: "1px solid var(--border)" }} />
-
-                  {/* Theme Picker */}
-                  <div className="p-4">
-                    <h3
-                      className="text-xs font-semibold uppercase tracking-wider mb-3"
-                      style={{ color: "var(--muted-foreground)" }}
-                    >
-                      Theme
-                    </h3>
-
-                    <div className="mb-3">
-                      <h4
-                        className="text-xs font-medium mb-2"
-                        style={{ color: "var(--muted-foreground)" }}
-                      >
-                        Light
-                      </h4>
-                      <div className="grid grid-cols-2 gap-2">
-                        {lightThemes.map((t) => (
-                          <button
-                            key={t.id}
-                            onClick={() => {
-                              setTheme(t.id);
-                            }}
-                            className="flex items-center gap-2 p-2 rounded-md transition-all"
-                            style={{
-                              backgroundColor: t.colors.secondary,
-                              color: t.colors.secondaryForeground,
-                              outline: theme.id === t.id ? `2px solid ${t.colors.primary}` : "none",
-                              outlineOffset: "1px",
-                            }}
-                          >
-                            <div className="flex -space-x-1">
-                              <span
-                                className="w-3 h-3 rounded-full border"
-                                style={{
-                                  backgroundColor: t.colors.background,
-                                  borderColor: t.colors.border,
-                                }}
-                              />
-                              <span
-                                className="w-3 h-3 rounded-full border"
-                                style={{
-                                  backgroundColor: t.colors.primary,
-                                  borderColor: t.colors.border,
-                                }}
-                              />
-                              <span
-                                className="w-3 h-3 rounded-full border"
-                                style={{
-                                  backgroundColor: t.colors.accent,
-                                  borderColor: t.colors.border,
-                                }}
-                              />
-                            </div>
-                            <span className="text-xs font-medium">{t.name}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4
-                        className="text-xs font-medium mb-2"
-                        style={{ color: "var(--muted-foreground)" }}
-                      >
-                        Dark
-                      </h4>
-                      <div className="grid grid-cols-2 gap-2">
-                        {darkThemes.map((t) => (
-                          <button
-                            key={t.id}
-                            onClick={() => {
-                              setTheme(t.id);
-                            }}
-                            className="flex items-center gap-2 p-2 rounded-md transition-all"
-                            style={{
-                              backgroundColor: t.colors.secondary,
-                              color: t.colors.secondaryForeground,
-                              outline: theme.id === t.id ? `2px solid ${t.colors.primary}` : "none",
-                              outlineOffset: "1px",
-                            }}
-                          >
-                            <div className="flex -space-x-1">
-                              <span
-                                className="w-3 h-3 rounded-full border"
-                                style={{
-                                  backgroundColor: t.colors.background,
-                                  borderColor: t.colors.border,
-                                }}
-                              />
-                              <span
-                                className="w-3 h-3 rounded-full border"
-                                style={{
-                                  backgroundColor: t.colors.primary,
-                                  borderColor: t.colors.border,
-                                }}
-                              />
-                              <span
-                                className="w-3 h-3 rounded-full border"
-                                style={{
-                                  backgroundColor: t.colors.accent,
-                                  borderColor: t.colors.border,
-                                }}
-                              />
-                            </div>
-                            <span className="text-xs font-medium">{t.name}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
                   </div>
 
                   {/* Divider */}
