@@ -329,6 +329,7 @@ function LoginModal({
                 backgroundColor: "var(--background)",
                 borderColor: "var(--border)",
               }}
+              autoComplete="email"
               required
             />
           </div>
@@ -349,6 +350,7 @@ function LoginModal({
                 backgroundColor: "var(--background)",
                 borderColor: "var(--border)",
               }}
+              autoComplete="current-password"
               required
             />
           </div>
@@ -476,6 +478,7 @@ function RegisterModal({
                 backgroundColor: "var(--background)",
                 borderColor: "var(--border)",
               }}
+              autoComplete="name"
               required
             />
           </div>
@@ -496,6 +499,7 @@ function RegisterModal({
                 backgroundColor: "var(--background)",
                 borderColor: "var(--border)",
               }}
+              autoComplete="email"
               required
             />
           </div>
@@ -516,6 +520,7 @@ function RegisterModal({
                 backgroundColor: "var(--background)",
                 borderColor: "var(--border)",
               }}
+              autoComplete="new-password"
               minLength={8}
               required
             />

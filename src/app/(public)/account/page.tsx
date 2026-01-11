@@ -156,6 +156,7 @@ export default function AccountPage() {
               backgroundColor: "var(--muted)",
               borderColor: "var(--border)",
             }}
+            autoComplete="off"
           />
           <p
             className="text-xs mt-1"
@@ -181,6 +182,7 @@ export default function AccountPage() {
               backgroundColor: "var(--background)",
               borderColor: "var(--border)",
             }}
+            autoComplete="name"
             required
             minLength={2}
           />
