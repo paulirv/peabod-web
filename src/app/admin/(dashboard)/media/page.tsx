@@ -527,6 +527,9 @@ export default function MediaLibraryPage() {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
                   In Use
                 </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -590,6 +593,22 @@ export default function MediaLibraryPage() {
                         Delete
                       </button>
                     )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setViewingMedia(item)}
+                        className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={() => setEditingMedia(item)}
+                        className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                      >
+                        Edit
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

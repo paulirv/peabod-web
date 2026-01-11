@@ -194,7 +194,7 @@ export default function MediaCard({
         )}
 
         {/* Hover overlay with actions */}
-        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex flex-col items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
           {onView && (
             <button
               onClick={(e) => {
