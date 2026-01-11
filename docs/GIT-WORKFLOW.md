@@ -79,6 +79,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/):
 
 [optional footer]
 ```
+Omit AI boilerplate text from commit messages.
 
 ### Types
 
