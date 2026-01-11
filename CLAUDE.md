@@ -28,6 +28,8 @@ npm run test:e2e            # E2E tests (Playwright)
 npm run test:e2e:headed     # E2E with visible browser
 ```
 
+See `docs/TESTING-PLAN.md` for comprehensive testing strategy.
+
 **Linting:**
 ```bash
 npm run lint
