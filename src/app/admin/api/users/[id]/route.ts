@@ -76,6 +76,14 @@ export async function PUT(
       );
     }
 
+    // Superuser (ID 1) role is locked to admin - cannot be changed by anyone
+    if (userId === 1 && body.role !== undefined && body.role !== "admin") {
+      return NextResponse.json(
+        { success: false, error: "Superuser role cannot be changed" },
+        { status: 403 }
+      );
+    }
+
     // Prevent demoting last admin
     if (body.role && body.role !== "admin" && existing.role === "admin") {
       const adminCount = await db
@@ -88,6 +96,14 @@ export async function PUT(
           { status: 400 }
         );
       }
+    }
+
+    // Superuser (ID 1) cannot be deactivated
+    if (userId === 1 && body.is_active === false) {
+      return NextResponse.json(
+        { success: false, error: "Superuser cannot be deactivated" },
+        { status: 403 }
+      );
     }
 
     // Prevent deactivating last admin
@@ -191,6 +207,14 @@ export async function DELETE(
       return NextResponse.json(
         { success: false, error: "User not found" },
         { status: 404 }
+      );
+    }
+
+    // Superuser (ID 1) cannot be deleted
+    if (userId === 1) {
+      return NextResponse.json(
+        { success: false, error: "Superuser cannot be deleted" },
+        { status: 403 }
       );
     }
 

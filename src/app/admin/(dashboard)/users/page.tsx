@@ -289,15 +289,21 @@ export default function UsersPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <select
-                      value={user.role}
-                      onChange={(e) => handleRoleChange(user, e.target.value as UserRole)}
-                      className="text-sm border border-gray-300 rounded px-2 py-1 bg-white text-gray-900"
-                    >
-                      <option value="admin">Admin</option>
-                      <option value="editor">Editor</option>
-                      <option value="author">Author</option>
-                    </select>
+                    {user.id === 1 ? (
+                      <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded" title="Superuser role is locked">
+                        Admin (locked)
+                      </span>
+                    ) : (
+                      <select
+                        value={user.role}
+                        onChange={(e) => handleRoleChange(user, e.target.value as UserRole)}
+                        className="text-sm border border-gray-300 rounded px-2 py-1 bg-white text-gray-900"
+                      >
+                        <option value="admin">Admin</option>
+                        <option value="editor">Editor</option>
+                        <option value="author">Author</option>
+                      </select>
+                    )}
                   </td>
                   <td className="px-6 py-4">{getStatusBadge(user)}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">
@@ -328,21 +334,25 @@ export default function UsersPage() {
                         >
                           Edit
                         </button>
-                        <button
-                          onClick={() => handleRevokeApproval(user)}
-                          className="text-yellow-600 hover:text-yellow-800"
-                        >
-                          Revoke
-                        </button>
-                        <button
-                          onClick={() => handleToggleActive(user)}
-                          className="text-gray-600 hover:text-gray-800"
-                        >
-                          Deactivate
-                        </button>
+                        {user.id !== 1 && (
+                          <>
+                            <button
+                              onClick={() => handleRevokeApproval(user)}
+                              className="text-yellow-600 hover:text-yellow-800"
+                            >
+                              Revoke
+                            </button>
+                            <button
+                              onClick={() => handleToggleActive(user)}
+                              className="text-gray-600 hover:text-gray-800"
+                            >
+                              Deactivate
+                            </button>
+                          </>
+                        )}
                       </>
                     )}
-                    {!user.is_active && (
+                    {!user.is_active && user.id !== 1 && (
                       <>
                         <button
                           onClick={() => handleToggleActive(user)}
@@ -392,17 +402,23 @@ export default function UsersPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                <select
-                  value={editingUser.role}
-                  onChange={(e) =>
-                    setEditingUser({ ...editingUser, role: e.target.value as UserRole })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white"
-                >
-                  <option value="admin">Admin</option>
-                  <option value="editor">Editor</option>
-                  <option value="author">Author</option>
-                </select>
+                {editingUser.id === 1 ? (
+                  <div className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-600 bg-gray-100">
+                    Admin (locked)
+                  </div>
+                ) : (
+                  <select
+                    value={editingUser.role}
+                    onChange={(e) =>
+                      setEditingUser({ ...editingUser, role: e.target.value as UserRole })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white"
+                  >
+                    <option value="admin">Admin</option>
+                    <option value="editor">Editor</option>
+                    <option value="author">Author</option>
+                  </select>
+                )}
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-6">
