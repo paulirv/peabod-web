@@ -2,10 +2,12 @@ import { getDB } from "@/lib/db";
 import { getSessionUser } from "@/lib/session";
 import { getCustomerSubdomain } from "@/lib/stream";
 import { getImageUrl } from "@/lib/image";
+import { createExcerpt } from "@/lib/html";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ResponsiveImageContainer } from "@/components/ResponsiveImage";
 import StreamPlayer from "@/components/StreamPlayer";
+import HtmlContent from "@/components/HtmlContent";
 import type { Metadata } from "next";
 
 interface Page {
@@ -62,7 +64,7 @@ export async function generateMetadata({
     return { title: "Page Not Found" };
   }
 
-  const description = page.body.substring(0, 160).trim() + "...";
+  const description = createExcerpt(page.body, 160);
   const url = `https://peabod.com/${slug}`;
 
   // Generate OG image URL
@@ -167,13 +169,7 @@ export default async function StaticPage({
         </figure>
       )}
 
-      <div className="prose prose-lg max-w-none">
-        {page.body.split("\n").map((paragraph, index) => (
-          <p key={index} className="mb-4 text-foreground leading-relaxed">
-            {paragraph}
-          </p>
-        ))}
-      </div>
+      <HtmlContent content={page.body} />
     </div>
   );
 }

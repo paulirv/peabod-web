@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ResponsiveImageContainer } from "./ResponsiveImage";
+import { createExcerpt } from "@/lib/html";
 
 interface Tag {
   id: number;
@@ -42,7 +43,7 @@ export default function ArticleCard({
   priority = false,
 }: ArticleCardProps) {
   const isVideo = media_type === "video";
-  const excerpt = body.length > 200 ? body.substring(0, 200) + "..." : body;
+  const excerpt = createExcerpt(body, 200);
   const formattedDate = new Date(authored_on).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",

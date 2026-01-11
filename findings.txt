@@ -1,0 +1,77 @@
+# WYSIWYG Editor Implementation - Findings
+
+## Branch: feature/wysiwyg-editor
+
+## Lessons Learned
+
+### TipTap Integration
+- TipTap is the recommended WYSIWYG editor for React/Next.js applications
+- Uses ProseMirror under the hood, which is battle-tested
+- Extension-based architecture makes it easy to add features
+- Outputs clean HTML that works well with existing rendering
+
+### Tailwind CSS v4 Plugin Configuration
+- In Tailwind CSS v4, plugins are added with `@plugin` directive in CSS
+- Example: `@plugin "@tailwindcss/typography";` in globals.css
+- No tailwind.config.js needed for basic plugin usage
+
+### Content Migration Strategy
+- For text-to-HTML migration, a JavaScript migration script works better than SQL
+- SQLite has limited string manipulation functions
+- Migration script can target local or remote with `--remote` flag
+- Always check if content is already HTML before migrating
+
+### Security Considerations
+- Use DOMPurify for sanitizing HTML content before rendering
+- Configure allowed tags and attributes explicitly
+- Content from admin users is still sanitized as defense-in-depth
+
+### HTML Content Handling
+- Need separate utilities for:
+  1. Rendering HTML (HtmlContent component with sanitization)
+  2. Stripping HTML for excerpts (createExcerpt utility)
+  3. Meta description generation (also needs HTML stripping)
+
+## Technical Discoveries
+
+### TipTap Editor Configuration
+- StarterKit includes basic extensions (bold, italic, etc.)
+- Additional extensions needed for: Link, Image, YouTube, Table, Placeholder, Underline
+- Editor props can set custom CSS classes for the content area
+- Modal-based UI for inserting links/images/videos works well
+
+### Backward Compatibility
+- HtmlContent component handles both HTML and legacy newline-separated text
+- Checks `/<[a-z][\s\S]*>/i` regex to detect HTML content
+- Falls back to newline-split rendering for legacy content
+
+## Issues Encountered
+
+### Port Conflict
+- Dev server started on port 3002 because 3000 was in use
+- Not an issue, just need to note when testing
+
+### Homepage Excerpt Display
+- Initial issue: HTML tags showing as text in article cards
+- Solution: Created `createExcerpt()` utility to strip HTML for previews
+- Also needed to update meta description generation
+
+### ESLint Warning on Migration Script
+- CommonJS `require()` triggered ESLint error in TypeScript project
+- Solution: Added eslint-disable comment since it's a standalone Node script
+
+### TipTap Import Issues
+- TipTap extensions use **named exports**, not default exports
+- Wrong: `import Table from "@tiptap/extension-table"`
+- Correct: `import { Table } from "@tiptap/extension-table"`
+- This applies to: Link, Image, Table, TableRow, TableCell, TableHeader, Placeholder, Underline
+
+### DOMPurify in Next.js
+- Standard `dompurify` package doesn't work well with Next.js SSR
+- Solution: Use `isomorphic-dompurify` instead - works in both Node.js and browser
+- Install: `npm install isomorphic-dompurify`
+
+### TipTap SSR Hydration
+- TipTap detects SSR and throws error about hydration mismatches
+- Solution: Add `immediatelyRender: false` to useEditor options
+- This prevents the editor from rendering during SSR, avoiding hydration issues

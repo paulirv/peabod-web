@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { ResponsiveImageContainer } from "@/components/ResponsiveImage";
 import MediaMetadataEditor from "./MediaMetadataEditor";
 import TagSelector from "./TagSelector";
+import TipTapEditor from "./TipTapEditor";
 
 interface EditorField {
   name: string;
   label: string;
-  type: "text" | "textarea" | "date" | "checkbox" | "select" | "image" | "media" | "tags";
+  type: "text" | "textarea" | "wysiwyg" | "date" | "checkbox" | "select" | "image" | "media" | "tags";
   required?: boolean;
   options?: { value: string | number; label: string }[];
 }
@@ -142,6 +143,14 @@ export default function Editor({
                 required={field.required}
                 rows={10}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
+              />
+            ) : field.type === "wysiwyg" ? (
+              <TipTapEditor
+                content={(formData[field.name] as string) || ""}
+                onChange={(content) =>
+                  setFormData((prev) => ({ ...prev, [field.name]: content }))
+                }
+                placeholder="Start writing your content..."
               />
             ) : field.type === "checkbox" ? (
               <input

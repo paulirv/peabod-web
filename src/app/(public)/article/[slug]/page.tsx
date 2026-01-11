@@ -5,7 +5,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ResponsiveImageContainer } from "@/components/ResponsiveImage";
 import StreamPlayer from "@/components/StreamPlayer";
+import HtmlContent from "@/components/HtmlContent";
 import { getImageUrl } from "@/lib/image";
+import { createExcerpt } from "@/lib/html";
 import type { Metadata } from "next";
 
 
@@ -83,7 +85,7 @@ export async function generateMetadata({
     return { title: "Article Not Found" };
   }
 
-  const description = article.body.substring(0, 160).trim() + "...";
+  const description = createExcerpt(article.body, 160);
   const url = `https://peabod.com/article/${slug}`;
 
   // Generate OG image URL (1200x630 is the standard for social sharing)
@@ -229,13 +231,7 @@ export default async function ArticlePage({
         </figure>
       )}
 
-      <div className="prose prose-lg max-w-none">
-        {article.body.split("\n").map((paragraph, index) => (
-          <p key={index} className="mb-4 text-foreground leading-relaxed">
-            {paragraph}
-          </p>
-        ))}
-      </div>
+      <HtmlContent content={article.body} />
     </article>
   );
 }
