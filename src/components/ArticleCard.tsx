@@ -107,18 +107,19 @@ export default function ArticleCard({
           <time dateTime={authored_on}>{formattedDate}</time>
         </div>
         {tags && tags.length > 0 && (
-          <div className="flex gap-2 mb-3">
+          <div className="flex flex-wrap gap-2 mb-3">
             {tags.map((tag) => (
-              <span
+              <Link
                 key={tag.id}
-                className="px-2 py-1 text-xs rounded-full"
+                href={`/tag/${tag.slug}`}
+                className="px-2 py-1 text-xs rounded-full transition-colors hover:opacity-80"
                 style={{
                   backgroundColor: "var(--secondary)",
                   color: "var(--secondary-foreground)",
                 }}
               >
                 {tag.name}
-              </span>
+              </Link>
             ))}
           </div>
         )}

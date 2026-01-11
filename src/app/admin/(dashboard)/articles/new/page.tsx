@@ -7,6 +7,7 @@ const articleFields = [
   { name: "author", label: "Author", type: "text" as const, required: true },
   { name: "authored_on", label: "Date", type: "date" as const, required: true },
   { name: "media_id", label: "Featured Media", type: "media" as const },
+  { name: "tag_ids", label: "Tags", type: "tags" as const },
   { name: "body", label: "Content", type: "textarea" as const, required: true },
   { name: "published", label: "Published", type: "checkbox" as const },
 ];

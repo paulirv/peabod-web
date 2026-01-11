@@ -7,6 +7,7 @@ import MediaCard from "@/components/admin/MediaCard";
 import MediaViewModal from "@/components/admin/MediaViewModal";
 import VideoUploader from "@/components/admin/VideoUploader";
 import VideoLinker from "@/components/admin/VideoLinker";
+import TagSelector from "@/components/admin/TagSelector";
 import type { Media, MediaWithUsage, MediaUsageDetails } from "@/types/media";
 
 interface MediaResponse {
@@ -829,6 +830,12 @@ export default function MediaLibraryPage() {
 }
 
 // Edit form component
+interface MediaTag {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 function EditMediaForm({
   media,
   onSave,
@@ -845,8 +852,28 @@ function EditMediaForm({
     lon: media.lon?.toString() || "",
     date_taken: media.date_taken ? media.date_taken.split("T")[0] : "",
   });
+  const [tagIds, setTagIds] = useState<number[]>([]);
+  const [loadingTags, setLoadingTags] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Fetch current tags for this media item
+  useEffect(() => {
+    const fetchMediaTags = async () => {
+      try {
+        const res = await fetch(`/admin/api/media/${media.id}`);
+        const data = (await res.json()) as { success: boolean; data?: { tags?: MediaTag[] } };
+        if (data.success && data.data?.tags) {
+          setTagIds(data.data.tags.map((t) => t.id));
+        }
+      } catch {
+        // Silently fail - just won't have existing tags
+      } finally {
+        setLoadingTags(false);
+      }
+    };
+    fetchMediaTags();
+  }, [media.id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -863,6 +890,7 @@ function EditMediaForm({
           lat: form.lat ? parseFloat(form.lat) : null,
           lon: form.lon ? parseFloat(form.lon) : null,
           date_taken: form.date_taken || null,
+          tag_ids: tagIds,
         }),
       });
 
@@ -961,6 +989,15 @@ function EditMediaForm({
           onChange={(e) => setForm({ ...form, date_taken: e.target.value })}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+        {loadingTags ? (
+          <div className="text-sm text-gray-500">Loading tags...</div>
+        ) : (
+          <TagSelector selectedTagIds={tagIds} onChange={setTagIds} />
+        )}
       </div>
 
       <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600">

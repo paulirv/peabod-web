@@ -4,11 +4,12 @@ import { useState, FormEvent, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ResponsiveImageContainer } from "@/components/ResponsiveImage";
 import MediaMetadataEditor from "./MediaMetadataEditor";
+import TagSelector from "./TagSelector";
 
 interface EditorField {
   name: string;
   label: string;
-  type: "text" | "textarea" | "date" | "checkbox" | "select" | "image" | "media";
+  type: "text" | "textarea" | "date" | "checkbox" | "select" | "image" | "media" | "tags";
   required?: boolean;
   options?: { value: string | number; label: string }[];
 }
@@ -172,6 +173,13 @@ export default function Editor({
                 mediaId={(formData[field.name] as number | null) || null}
                 onMediaChange={(mediaId) =>
                   setFormData((prev) => ({ ...prev, [field.name]: mediaId }))
+                }
+              />
+            ) : field.type === "tags" ? (
+              <TagSelector
+                selectedTagIds={(formData[field.name] as number[]) || []}
+                onChange={(tagIds) =>
+                  setFormData((prev) => ({ ...prev, [field.name]: tagIds }))
                 }
               />
             ) : field.type === "image" ? (

@@ -40,7 +40,20 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ success: true, data: media });
+    // Get tags for this media
+    const { results: tags } = await db
+      .prepare(
+        `SELECT t.* FROM tags t
+         JOIN media_tags mt ON t.id = mt.tag_id
+         WHERE mt.media_id = ?`
+      )
+      .bind(media.id)
+      .all();
+
+    return NextResponse.json({
+      success: true,
+      data: { ...media, tags: tags || [] },
+    });
   } catch (error) {
     console.error("Error fetching media:", error);
     return NextResponse.json(
@@ -117,13 +130,40 @@ export async function PUT(
       .bind(...values)
       .run();
 
-    // Fetch updated record
+    // Update tags if provided
+    if (body.tag_ids !== undefined) {
+      await db
+        .prepare("DELETE FROM media_tags WHERE media_id = ?")
+        .bind(parseInt(id))
+        .run();
+
+      for (const tagId of body.tag_ids) {
+        await db
+          .prepare("INSERT INTO media_tags (media_id, tag_id) VALUES (?, ?)")
+          .bind(parseInt(id), tagId)
+          .run();
+      }
+    }
+
+    // Fetch updated record with tags
     const updated = await db
       .prepare("SELECT * FROM media WHERE id = ?")
       .bind(parseInt(id))
       .first<Media>();
 
-    return NextResponse.json({ success: true, data: updated });
+    const { results: updatedTags } = await db
+      .prepare(
+        `SELECT t.* FROM tags t
+         JOIN media_tags mt ON t.id = mt.tag_id
+         WHERE mt.media_id = ?`
+      )
+      .bind(parseInt(id))
+      .all();
+
+    return NextResponse.json({
+      success: true,
+      data: { ...updated, tags: updatedTags || [] },
+    });
   } catch (error) {
     console.error("Error updating media:", error);
     return NextResponse.json(

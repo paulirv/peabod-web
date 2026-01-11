@@ -95,6 +95,7 @@ interface CreatePageBody {
   authored_on: string;
   media_id?: number;
   published?: boolean;
+  tag_ids?: number[];
 }
 
 // Generate a URL-friendly slug from a title
@@ -143,9 +144,21 @@ export async function POST(request: NextRequest) {
       .bind(slug, title, content, author, authored_on, media_id || null, published ? 1 : 0, auth.user.id)
       .run();
 
+    const pageId = result.meta.last_row_id;
+
+    // Insert tags if provided
+    if (body.tag_ids && body.tag_ids.length > 0) {
+      for (const tagId of body.tag_ids) {
+        await db
+          .prepare("INSERT INTO page_tags (page_id, tag_id) VALUES (?, ?)")
+          .bind(pageId, tagId)
+          .run();
+      }
+    }
+
     const page = await db
       .prepare("SELECT * FROM pages WHERE id = ?")
-      .bind(result.meta.last_row_id)
+      .bind(pageId)
       .first();
 
     return NextResponse.json({ success: true, data: page }, { status: 201 });

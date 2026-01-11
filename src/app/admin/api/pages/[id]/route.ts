@@ -10,6 +10,7 @@ interface UpdatePageBody {
   authored_on?: string;
   media_id?: number | null;
   published?: boolean;
+  tag_ids?: number[];
 }
 
 // GET /api/pages/[id] - Get single page with media data
@@ -85,6 +86,16 @@ export async function GET(
         }
       : null;
 
+    // Get tags for this page
+    const { results: tags } = await db
+      .prepare(
+        `SELECT t.* FROM tags t
+         JOIN page_tags pt ON t.id = pt.tag_id
+         WHERE pt.page_id = ?`
+      )
+      .bind(p.id)
+      .all();
+
     // Remove the joined media fields from page object
     const {
       media_id_resolved: _mid, media_path: _mp, media_alt: _ma, media_title: _mt,
@@ -95,7 +106,7 @@ export async function GET(
     void _mid; void _mp; void _ma; void _mt; void _mw; void _mh;
     void _mtype; void _msu; void _md; void _mtu; void _mss;
 
-    return NextResponse.json({ success: true, data: { ...pageData, media } });
+    return NextResponse.json({ success: true, data: { ...pageData, tags: tags || [], media } });
   } catch (error) {
     console.error("Error fetching page:", error);
     return NextResponse.json(
@@ -170,6 +181,21 @@ export async function PUT(
       .prepare(`UPDATE pages SET ${updates.join(", ")} WHERE id = ?`)
       .bind(...values)
       .run();
+
+    // Update tags if provided
+    if (body.tag_ids !== undefined) {
+      await db
+        .prepare("DELETE FROM page_tags WHERE page_id = ?")
+        .bind(parseInt(id))
+        .run();
+
+      for (const tagId of body.tag_ids) {
+        await db
+          .prepare("INSERT INTO page_tags (page_id, tag_id) VALUES (?, ?)")
+          .bind(parseInt(id), tagId)
+          .run();
+      }
+    }
 
     const updated = await db
       .prepare("SELECT * FROM pages WHERE id = ?")

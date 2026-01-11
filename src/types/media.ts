@@ -52,6 +52,7 @@ export interface MediaUpdateInput {
   lat?: number | null;
   lon?: number | null;
   date_taken?: string | null;
+  tag_ids?: number[];
 }
 
 // Media with additional computed fields for display

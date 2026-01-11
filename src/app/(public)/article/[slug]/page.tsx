@@ -185,14 +185,15 @@ export default async function ArticlePage({
           <time dateTime={article.authored_on}>{formattedDate}</time>
         </div>
         {article.tags && article.tags.length > 0 && (
-          <div className="flex gap-2 mt-4">
+          <div className="flex flex-wrap gap-2 mt-4">
             {article.tags.map((tag) => (
-              <span
+              <Link
                 key={tag.id}
-                className="px-3 py-1 bg-secondary text-secondary-foreground text-sm rounded-full"
+                href={`/tag/${tag.slug}`}
+                className="px-3 py-1 bg-secondary text-secondary-foreground text-sm rounded-full hover:opacity-80 transition-opacity"
               >
                 {tag.name}
-              </span>
+              </Link>
             ))}
           </div>
         )}

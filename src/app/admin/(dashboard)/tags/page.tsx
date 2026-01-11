@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
+import Link from "next/link";
 
 interface Tag {
   id: number;
   name: string;
   slug: string;
+  article_count: number;
+  page_count: number;
+  media_count: number;
 }
 
 export default function TagsPage() {
@@ -55,7 +59,12 @@ export default function TagsPage() {
   };
 
   const handleDelete = async (tag: Tag) => {
-    if (!confirm(`Are you sure you want to delete "${tag.name}"?`)) {
+    const totalUsage = tag.article_count + tag.page_count + tag.media_count;
+    const warningMsg = totalUsage > 0
+      ? `"${tag.name}" is used by ${totalUsage} item(s). Deleting it will remove the tag from all content. Are you sure?`
+      : `Are you sure you want to delete "${tag.name}"?`;
+
+    if (!confirm(warningMsg)) {
       return;
     }
     try {
@@ -75,6 +84,10 @@ export default function TagsPage() {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
+  };
+
+  const getTotalUsage = (tag: Tag) => {
+    return tag.article_count + tag.page_count + tag.media_count;
   };
 
   if (loading) {
@@ -127,6 +140,15 @@ export default function TagsPage() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Slug
               </th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Articles
+              </th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Pages
+              </th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Media
+              </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
@@ -135,7 +157,7 @@ export default function TagsPage() {
           <tbody className="divide-y divide-gray-200">
             {tags.length === 0 ? (
               <tr>
-                <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                   No tags yet. Create your first tag above.
                 </td>
               </tr>
@@ -143,18 +165,68 @@ export default function TagsPage() {
               tags.map((tag) => (
                 <tr key={tag.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {tag.name}
+                    <Link
+                      href={`/admin/tags/${tag.id}`}
+                      className="text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      {tag.name}
+                    </Link>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {tag.slug}
+                    <Link
+                      href={`/tag/${tag.slug}`}
+                      target="_blank"
+                      className="text-gray-500 hover:text-gray-700 hover:underline"
+                    >
+                      {tag.slug}
+                    </Link>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                    {tag.article_count > 0 ? (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {tag.article_count}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">0</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                    {tag.page_count > 0 ? (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {tag.page_count}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">0</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                    {tag.media_count > 0 ? (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                        {tag.media_count}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">0</span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                    <button
-                      onClick={() => handleDelete(tag)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      Delete
-                    </button>
+                    <div className="flex items-center justify-end gap-3">
+                      <Link
+                        href={`/admin/tags/${tag.id}`}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        View
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(tag)}
+                        className={`${
+                          getTotalUsage(tag) > 0
+                            ? "text-orange-600 hover:text-orange-800"
+                            : "text-red-600 hover:text-red-800"
+                        }`}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))

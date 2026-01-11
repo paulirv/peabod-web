@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDB } from "@/lib/db";
 import { requireEditor } from "@/lib/api-auth";
 
-// GET /api/tags - List all tags
+// GET /api/tags - List all tags with content counts
 export async function GET() {
   const auth = await requireEditor();
   if (!auth.authorized) return auth.response;
@@ -10,7 +10,15 @@ export async function GET() {
   try {
     const db = getDB();
     const { results } = await db
-      .prepare("SELECT * FROM tags ORDER BY name ASC")
+      .prepare(`
+        SELECT
+          t.*,
+          (SELECT COUNT(*) FROM article_tags WHERE tag_id = t.id) as article_count,
+          (SELECT COUNT(*) FROM page_tags WHERE tag_id = t.id) as page_count,
+          (SELECT COUNT(*) FROM media_tags WHERE tag_id = t.id) as media_count
+        FROM tags t
+        ORDER BY t.name ASC
+      `)
       .all();
 
     return NextResponse.json({

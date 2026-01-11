@@ -7,7 +7,7 @@ interface UpdateTagBody {
   slug?: string;
 }
 
-// GET /api/tags/[id] - Get single tag
+// GET /api/tags/[id] - Get single tag with content
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -24,7 +24,7 @@ export async function GET(
       ? "SELECT * FROM tags WHERE id = ?"
       : "SELECT * FROM tags WHERE slug = ?";
 
-    const tag = await db.prepare(query).bind(isNumeric ? parseInt(id) : id).first();
+    const tag = await db.prepare(query).bind(isNumeric ? parseInt(id) : id).first<{ id: number; name: string; slug: string }>();
 
     if (!tag) {
       return NextResponse.json(
@@ -33,15 +33,53 @@ export async function GET(
       );
     }
 
-    // Get articles count for this tag
-    const countResult = await db
-      .prepare("SELECT COUNT(*) as count FROM article_tags WHERE tag_id = ?")
+    // Get articles with this tag
+    const { results: articles } = await db
+      .prepare(`
+        SELECT a.id, a.slug, a.title, a.author, a.authored_on, a.published
+        FROM articles a
+        JOIN article_tags at ON a.id = at.article_id
+        WHERE at.tag_id = ?
+        ORDER BY a.authored_on DESC
+      `)
       .bind(tag.id)
-      .first<{ count: number }>();
+      .all();
+
+    // Get pages with this tag
+    const { results: pages } = await db
+      .prepare(`
+        SELECT p.id, p.slug, p.title, p.author, p.authored_on, p.published
+        FROM pages p
+        JOIN page_tags pt ON p.id = pt.page_id
+        WHERE pt.tag_id = ?
+        ORDER BY p.authored_on DESC
+      `)
+      .bind(tag.id)
+      .all();
+
+    // Get media with this tag
+    const { results: media } = await db
+      .prepare(`
+        SELECT m.id, m.title, m.filename, m.path, m.type, m.created_at
+        FROM media m
+        JOIN media_tags mt ON m.id = mt.media_id
+        WHERE mt.tag_id = ?
+        ORDER BY m.created_at DESC
+      `)
+      .bind(tag.id)
+      .all();
 
     return NextResponse.json({
       success: true,
-      data: { ...tag, article_count: countResult?.count || 0 },
+      data: {
+        ...tag,
+        article_count: articles?.length || 0,
+        page_count: pages?.length || 0,
+        media_count: media?.length || 0,
+        articles: articles || [],
+        pages: pages || [],
+        media: media || [],
+      },
     });
   } catch (error) {
     console.error("Error fetching tag:", error);
