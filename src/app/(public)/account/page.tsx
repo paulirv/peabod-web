@@ -24,6 +24,17 @@ export default function AccountPage() {
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
 
+  // Password change state
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState("");
+
   const fetchUser = useCallback(async () => {
     try {
       const res = await fetch("/api/auth/me");
@@ -84,6 +95,61 @@ export default function AccountPage() {
       setError("An error occurred");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handlePasswordChange(e: React.FormEvent) {
+    e.preventDefault();
+    setPasswordError("");
+    setPasswordSuccess("");
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPasswordError("All password fields are required");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setPasswordError("New password must be at least 8 characters");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New passwords do not match");
+      return;
+    }
+
+    setPasswordSaving(true);
+
+    try {
+      const res = await fetch("/api/auth/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          current_password: currentPassword,
+          new_password: newPassword,
+        }),
+      });
+
+      const data = (await res.json()) as {
+        success: boolean;
+        error?: string;
+      };
+
+      if (data.success) {
+        setPasswordSuccess("Password changed successfully");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setShowCurrentPassword(false);
+        setShowNewPassword(false);
+        setShowConfirmPassword(false);
+      } else {
+        setPasswordError(data.error || "Failed to change password");
+      }
+    } catch {
+      setPasswordError("An error occurred");
+    } finally {
+      setPasswordSaving(false);
     }
   }
 
@@ -234,6 +300,159 @@ export default function AccountPage() {
           </button>
         </div>
       </form>
+
+      {/* Password Change Section */}
+      <div
+        className="mt-12 pt-8 border-t"
+        style={{ borderColor: "var(--border)" }}
+      >
+        <h2
+          className="text-2xl font-bold mb-6"
+          style={{ color: "var(--foreground)" }}
+        >
+          Change Password
+        </h2>
+
+        <form onSubmit={handlePasswordChange} className="space-y-6">
+          {passwordError && (
+            <div
+              className="p-4 rounded"
+              style={{
+                backgroundColor: "var(--destructive)",
+                color: "var(--destructive-foreground)",
+              }}
+            >
+              {passwordError}
+            </div>
+          )}
+
+          {passwordSuccess && (
+            <div
+              className="p-4 rounded"
+              style={{
+                backgroundColor: "var(--accent)",
+                color: "var(--accent-foreground)",
+              }}
+            >
+              {passwordSuccess}
+            </div>
+          )}
+
+          <div>
+            <label
+              className="block text-sm font-medium mb-2"
+              style={{ color: "var(--foreground)" }}
+            >
+              Current Password
+            </label>
+            <div className="relative">
+              <input
+                type={showCurrentPassword ? "text" : "password"}
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="w-full px-4 py-2 rounded border text-foreground pr-16"
+                style={{
+                  backgroundColor: "var(--background)",
+                  borderColor: "var(--border)",
+                }}
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-sm"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                {showCurrentPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label
+              className="block text-sm font-medium mb-2"
+              style={{ color: "var(--foreground)" }}
+            >
+              New Password
+            </label>
+            <div className="relative">
+              <input
+                type={showNewPassword ? "text" : "password"}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full px-4 py-2 rounded border text-foreground pr-16"
+                style={{
+                  backgroundColor: "var(--background)",
+                  borderColor: "var(--border)",
+                }}
+                autoComplete="new-password"
+                placeholder="Minimum 8 characters"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-sm"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                {showNewPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label
+              className="block text-sm font-medium mb-2"
+              style={{ color: "var(--foreground)" }}
+            >
+              Confirm New Password
+            </label>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full px-4 py-2 rounded border text-foreground pr-16"
+                style={{
+                  backgroundColor: "var(--background)",
+                  borderColor: confirmPassword && newPassword !== confirmPassword
+                    ? "var(--destructive)"
+                    : "var(--border)",
+                }}
+                autoComplete="new-password"
+                placeholder="Re-enter new password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-sm"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                {showConfirmPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+            {confirmPassword && newPassword !== confirmPassword && (
+              <p
+                className="text-xs mt-1"
+                style={{ color: "var(--destructive)" }}
+              >
+                Passwords do not match
+              </p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={passwordSaving}
+            className="px-6 py-2 rounded font-medium transition-colors disabled:opacity-50"
+            style={{
+              backgroundColor: "var(--primary)",
+              color: "var(--primary-foreground)",
+            }}
+          >
+            {passwordSaving ? "Changing..." : "Change Password"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

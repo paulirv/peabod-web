@@ -29,9 +29,18 @@ export default function UsersPage() {
   const [newUser, setNewUser] = useState({
     email: "",
     password: "",
+    confirmPassword: "",
     name: "",
     role: "author" as UserRole,
   });
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showNewConfirmPassword, setShowNewConfirmPassword] = useState(false);
+  const [editPassword, setEditPassword] = useState({
+    password: "",
+    confirmPassword: "",
+  });
+  const [showEditPassword, setShowEditPassword] = useState(false);
+  const [showEditConfirmPassword, setShowEditConfirmPassword] = useState(false);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -168,19 +177,41 @@ export default function UsersPage() {
 
   const handleSaveEdit = async () => {
     if (!editingUser) return;
+
+    // Validate password if being changed
+    if (editPassword.password) {
+      if (editPassword.password.length < 8) {
+        alert("Password must be at least 8 characters");
+        return;
+      }
+      if (editPassword.password !== editPassword.confirmPassword) {
+        alert("Passwords do not match");
+        return;
+      }
+    }
+
     setSaving(true);
     try {
+      const payload: Record<string, unknown> = {
+        name: editingUser.name,
+        bio: editingUser.bio,
+        role: editingUser.role,
+      };
+
+      if (editPassword.password) {
+        payload.password = editPassword.password;
+      }
+
       const res = await fetch(`/admin/api/users/${editingUser.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: editingUser.name,
-          bio: editingUser.bio,
-          role: editingUser.role,
-        }),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
         setEditingUser(null);
+        setEditPassword({ password: "", confirmPassword: "" });
+        setShowEditPassword(false);
+        setShowEditConfirmPassword(false);
         fetchUsers();
       } else {
         const data = (await res.json()) as { error?: string };
@@ -202,6 +233,10 @@ export default function UsersPage() {
       alert("Password must be at least 8 characters");
       return;
     }
+    if (newUser.password !== newUser.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
     setSaving(true);
     try {
       const res = await fetch("/admin/api/users", {
@@ -211,7 +246,9 @@ export default function UsersPage() {
       });
       if (res.ok) {
         setShowNewUserModal(false);
-        setNewUser({ email: "", password: "", name: "", role: "author" });
+        setNewUser({ email: "", password: "", confirmPassword: "", name: "", role: "author" });
+        setShowNewPassword(false);
+        setShowNewConfirmPassword(false);
         fetchUsers();
       } else {
         const data = (await res.json()) as { error?: string };
@@ -466,10 +503,64 @@ export default function UsersPage() {
                   </select>
                 )}
               </div>
+
+              {/* Password Change Section */}
+              <div className="border-t border-gray-200 pt-4 mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Change Password
+                  <span className="text-gray-400 font-normal ml-1">(optional)</span>
+                </label>
+                <div className="space-y-3">
+                  <div className="relative">
+                    <input
+                      type={showEditPassword ? "text" : "password"}
+                      value={editPassword.password}
+                      onChange={(e) => setEditPassword({ ...editPassword, password: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white pr-10"
+                      placeholder="New password (min 8 characters)"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowEditPassword(!showEditPassword)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-sm"
+                    >
+                      {showEditPassword ? "Hide" : "Show"}
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showEditConfirmPassword ? "text" : "password"}
+                      value={editPassword.confirmPassword}
+                      onChange={(e) => setEditPassword({ ...editPassword, confirmPassword: e.target.value })}
+                      className={`w-full px-3 py-2 border rounded-lg text-gray-900 bg-white pr-10 ${
+                        editPassword.confirmPassword && editPassword.password !== editPassword.confirmPassword
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      }`}
+                      placeholder="Confirm new password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowEditConfirmPassword(!showEditConfirmPassword)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-sm"
+                    >
+                      {showEditConfirmPassword ? "Hide" : "Show"}
+                    </button>
+                  </div>
+                  {editPassword.confirmPassword && editPassword.password !== editPassword.confirmPassword && (
+                    <p className="text-red-500 text-xs">Passwords do not match</p>
+                  )}
+                </div>
+              </div>
             </div>
             <div className="flex justify-end gap-3 mt-6">
               <button
-                onClick={() => setEditingUser(null)}
+                onClick={() => {
+                  setEditingUser(null);
+                  setEditPassword({ password: "", confirmPassword: "" });
+                  setShowEditPassword(false);
+                  setShowEditConfirmPassword(false);
+                }}
                 className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
               >
                 Cancel
@@ -508,13 +599,50 @@ export default function UsersPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Password <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="password"
-                  value={newUser.password}
-                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white"
-                  placeholder="Minimum 8 characters"
-                />
+                <div className="relative">
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    value={newUser.password}
+                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white pr-10"
+                    placeholder="Minimum 8 characters"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-sm"
+                  >
+                    {showNewPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Confirm Password <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type={showNewConfirmPassword ? "text" : "password"}
+                    value={newUser.confirmPassword}
+                    onChange={(e) => setNewUser({ ...newUser, confirmPassword: e.target.value })}
+                    className={`w-full px-3 py-2 border rounded-lg text-gray-900 bg-white pr-10 ${
+                      newUser.confirmPassword && newUser.password !== newUser.confirmPassword
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                    placeholder="Re-enter password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewConfirmPassword(!showNewConfirmPassword)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-sm"
+                  >
+                    {showNewConfirmPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
+                {newUser.confirmPassword && newUser.password !== newUser.confirmPassword && (
+                  <p className="text-red-500 text-xs mt-1">Passwords do not match</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -545,7 +673,9 @@ export default function UsersPage() {
               <button
                 onClick={() => {
                   setShowNewUserModal(false);
-                  setNewUser({ email: "", password: "", name: "", role: "author" });
+                  setNewUser({ email: "", password: "", confirmPassword: "", name: "", role: "author" });
+                  setShowNewPassword(false);
+                  setShowNewConfirmPassword(false);
                 }}
                 className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
               >

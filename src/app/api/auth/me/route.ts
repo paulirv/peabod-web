@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDB } from "@/lib/db";
 import { getSessionUser } from "@/lib/session";
+import { hashPassword, verifyPassword } from "@/lib/password";
 
 // GET - Get current user
 // Returns 200 with data: null if not authenticated (not an error state)
@@ -43,6 +44,8 @@ interface UpdateProfileBody {
   name?: string;
   bio?: string;
   avatar_media_id?: number | null;
+  current_password?: string;
+  new_password?: string;
 }
 
 // PATCH - Update profile
@@ -58,7 +61,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = (await request.json()) as UpdateProfileBody;
-    const { name, bio, avatar_media_id } = body;
+    const { name, bio, avatar_media_id, current_password, new_password } = body;
 
     const db = getDB();
     const updates: string[] = [];
@@ -81,6 +84,51 @@ export async function PATCH(request: NextRequest) {
     if (avatar_media_id !== undefined) {
       updates.push("avatar_media_id = ?");
       params.push(avatar_media_id);
+    }
+
+    // Handle password change
+    if (new_password !== undefined) {
+      if (!current_password) {
+        return NextResponse.json(
+          { success: false, error: "Current password is required" },
+          { status: 400 }
+        );
+      }
+      if (new_password.length < 8) {
+        return NextResponse.json(
+          { success: false, error: "New password must be at least 8 characters" },
+          { status: 400 }
+        );
+      }
+
+      // Verify current password
+      const userWithPassword = await db
+        .prepare("SELECT password_hash FROM users WHERE id = ?")
+        .bind(user.id)
+        .first<{ password_hash: string }>();
+
+      if (!userWithPassword) {
+        return NextResponse.json(
+          { success: false, error: "User not found" },
+          { status: 404 }
+        );
+      }
+
+      const isValidPassword = await verifyPassword(
+        current_password,
+        userWithPassword.password_hash
+      );
+
+      if (!isValidPassword) {
+        return NextResponse.json(
+          { success: false, error: "Current password is incorrect" },
+          { status: 401 }
+        );
+      }
+
+      const newPasswordHash = await hashPassword(new_password);
+      updates.push("password_hash = ?");
+      params.push(newPasswordHash);
     }
 
     if (updates.length === 0) {
