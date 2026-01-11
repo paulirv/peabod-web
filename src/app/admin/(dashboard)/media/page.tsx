@@ -694,7 +694,7 @@ export default function MediaLibraryPage() {
                       {usageDetails.articles.map((article) => (
                         <li key={article.id}>
                           <Link
-                            href={`/articles/${article.id}/edit`}
+                            href={`/admin/articles/${article.id}/edit`}
                             className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
                             onClick={() => setUsageModal(null)}
                           >
@@ -712,7 +712,7 @@ export default function MediaLibraryPage() {
                       {usageDetails.pages.map((page) => (
                         <li key={page.id}>
                           <Link
-                            href={`/pages/${page.id}/edit`}
+                            href={`/admin/pages/${page.id}/edit`}
                             className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
                             onClick={() => setUsageModal(null)}
                           >
