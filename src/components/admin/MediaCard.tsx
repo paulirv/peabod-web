@@ -248,6 +248,7 @@ export default function MediaCard({
           {media.title}
         </h3>
         <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
+          <span className="font-medium text-gray-600">ID: {media.id}</span>
           {media.width && media.height && (
             <span>
               {media.width}x{media.height}

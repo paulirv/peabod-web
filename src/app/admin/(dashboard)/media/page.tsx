@@ -488,6 +488,9 @@ export default function MediaLibraryPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
+                  ID
+                </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
                   Thumb
                 </th>
@@ -535,6 +538,9 @@ export default function MediaLibraryPage() {
             <tbody className="divide-y divide-gray-200">
               {sortedMedia.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                    {item.id}
+                  </td>
                   <td className="px-4 py-3">
                     <button
                       onClick={() => setViewingMedia(item)}
@@ -958,6 +964,7 @@ function EditMediaForm({
       </div>
 
       <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600">
+        <p><span className="font-medium">ID:</span> {media.id}</p>
         <p><span className="font-medium">Filename:</span> {media.filename}</p>
         <p><span className="font-medium">Type:</span> {media.mime_type}</p>
         {media.width && media.height && (
