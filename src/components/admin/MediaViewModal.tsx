@@ -9,6 +9,10 @@ interface MediaViewModalProps {
   media: Media;
   customerSubdomain?: string;
   onClose: () => void;
+  onPrev?: () => void;
+  onNext?: () => void;
+  hasPrev?: boolean;
+  hasNext?: boolean;
 }
 
 function formatFileSize(bytes: number): string {
@@ -27,29 +31,37 @@ export default function MediaViewModal({
   media,
   customerSubdomain,
   onClose,
+  onPrev,
+  onNext,
+  hasPrev = false,
+  hasNext = false,
 }: MediaViewModalProps) {
   const isVideo = media.type === "video";
 
-  // Handle escape key
-  const handleEscape = useCallback(
+  // Handle keyboard navigation
+  const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
+      } else if (e.key === "ArrowLeft" && hasPrev && onPrev) {
+        onPrev();
+      } else if (e.key === "ArrowRight" && hasNext && onNext) {
+        onNext();
       }
     },
-    [onClose]
+    [onClose, onPrev, onNext, hasPrev, hasNext]
   );
 
   useEffect(() => {
-    document.addEventListener("keydown", handleEscape);
+    document.addEventListener("keydown", handleKeyDown);
     // Prevent body scroll when modal is open
     document.body.style.overflow = "hidden";
 
     return () => {
-      document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
     };
-  }, [handleEscape]);
+  }, [handleKeyDown]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -59,8 +71,54 @@ export default function MediaViewModal({
         onClick={onClose}
       />
 
+      {/* Previous button */}
+      {hasPrev && onPrev && (
+        <button
+          onClick={onPrev}
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full transition-all"
+          aria-label="Previous"
+        >
+          <svg
+            className="w-8 h-8"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
+      )}
+
+      {/* Next button */}
+      {hasNext && onNext && (
+        <button
+          onClick={onNext}
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full transition-all"
+          aria-label="Next"
+        >
+          <svg
+            className="w-8 h-8"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </button>
+      )}
+
       {/* Modal content */}
-      <div className="relative z-10 max-w-5xl w-full mx-4 max-h-[90vh] flex flex-col">
+      <div className="relative z-10 max-w-5xl w-full mx-16 max-h-[90vh] flex flex-col">
         {/* Close button */}
         <button
           onClick={onClose}

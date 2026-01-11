@@ -782,13 +782,23 @@ export default function MediaLibraryPage() {
       )}
 
       {/* Media View Modal */}
-      {viewingMedia && (
-        <MediaViewModal
-          media={viewingMedia}
-          customerSubdomain={customerSubdomain || undefined}
-          onClose={() => setViewingMedia(null)}
-        />
-      )}
+      {viewingMedia && (() => {
+        const currentIndex = filteredMedia.findIndex(m => m.id === viewingMedia.id);
+        const hasPrev = currentIndex > 0;
+        const hasNext = currentIndex < filteredMedia.length - 1;
+
+        return (
+          <MediaViewModal
+            media={viewingMedia}
+            customerSubdomain={customerSubdomain || undefined}
+            onClose={() => setViewingMedia(null)}
+            hasPrev={hasPrev}
+            hasNext={hasNext}
+            onPrev={hasPrev ? () => setViewingMedia(filteredMedia[currentIndex - 1]) : undefined}
+            onNext={hasNext ? () => setViewingMedia(filteredMedia[currentIndex + 1]) : undefined}
+          />
+        );
+      })()}
     </div>
   );
 }
