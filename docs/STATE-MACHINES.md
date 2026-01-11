@@ -5,19 +5,20 @@ This document contains state machine diagrams for the stateful components in the
 ## Table of Contents
 
 1. [Header Component](#header-component)
-2. [LoginModal Component](#loginmodal-component)
-3. [RegisterModal Component](#registermodal-component)
-4. [MediaMetadataEditor Component](#mediametadataeditor-component)
-5. [Editor Component](#editor-component)
-6. [MediaLibraryPage Component](#medialibrarypage-component)
-7. [UsersPage Component](#userspage-component)
-8. [ThemeProvider Component](#themeprovider-component)
+2. [Footer Component](#footer-component)
+3. [LoginModal Component](#loginmodal-component)
+4. [RegisterModal Component](#registermodal-component)
+5. [MediaMetadataEditor Component](#mediametadataeditor-component)
+6. [Editor Component](#editor-component)
+7. [MediaLibraryPage Component](#medialibrarypage-component)
+8. [UsersPage Component](#userspage-component)
+9. [ThemeProvider Component](#themeprovider-component)
 
 ---
 
 ## Header Component
 
-The Header manages navigation, theme selection, and user authentication via a hamburger menu.
+The Header manages navigation and user authentication via a hamburger menu.
 
 ```mermaid
 stateDiagram-v2
@@ -35,9 +36,6 @@ stateDiagram-v2
     MenuOpen --> MenuClosed: Click Outside
     MenuOpen --> MenuClosed: Click Hamburger
 
-    MenuOpen --> ThemeChange: Select Theme
-    ThemeChange --> MenuOpen: Theme Applied
-
     MenuOpen --> ShowLoginModal: Click Sign In
     MenuOpen --> ShowRegisterModal: Click Create Account
 
@@ -53,6 +51,27 @@ stateDiagram-v2
 
     LoggedIn --> [*]: Unmount
     LoggedOut --> [*]: Unmount
+```
+
+---
+
+## Footer Component
+
+The Footer displays copyright info and provides theme selection via a dropdown picker.
+
+```mermaid
+stateDiagram-v2
+    [*] --> PickerClosed: Component Mount
+
+    state "Picker Closed" as PickerClosed
+    state "Picker Open" as PickerOpen
+
+    PickerClosed --> PickerOpen: Click Theme Chip
+    PickerOpen --> PickerClosed: Click Outside
+    PickerOpen --> PickerClosed: Click Theme Chip
+
+    PickerOpen --> ThemeChange: Select Theme
+    ThemeChange --> PickerClosed: Theme Applied + Close Picker
 ```
 
 ---
@@ -395,6 +414,11 @@ flowchart TB
         AuthState[Auth State\nHeader]
     end
 
+    subgraph "Layout Components"
+        Header[Header]
+        Footer[Footer]
+    end
+
     subgraph "Admin Pages"
         MediaPage[MediaLibraryPage]
         UsersPage[UsersPage]
@@ -417,10 +441,11 @@ flowchart TB
         TagsAPI["/admin/api/tags/*"]
     end
 
+    ThemeProvider --> Footer
     ThemeProvider --> MediaPage
     ThemeProvider --> UsersPage
-    AuthState --> MediaPage
-    AuthState --> UsersPage
+    AuthState --> Header
+    Header --> AuthAPI
 
     MediaPage --> MediaCard
     MediaPage --> MediaMetadataEditor
@@ -435,8 +460,6 @@ flowchart TB
 
     UsersPage --> UsersAPI
     TagsPage --> TagsAPI
-
-    AuthState --> AuthAPI
 ```
 
 ---
