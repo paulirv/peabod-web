@@ -133,3 +133,93 @@ export async function generateMetadata(): Promise<Metadata> {
 - `src/lib/settings.ts` - Public settings helper with site_icon_path
 
 ---
+
+## TipTap WYSIWYG Editor Integration in Next.js
+
+**Date:** 2026-01-11
+
+**Problem:** Integrating TipTap WYSIWYG editor in a Next.js 15 app with Cloudflare Workers deployment encountered several issues with imports, SSR, and HTML sanitization.
+
+### Issue 1: Named Exports for Extensions
+
+**Problem:** Runtime error "Cannot read properties of undefined (reading 'configure')" when configuring TipTap extensions.
+
+**Root Cause:** TipTap extensions use **named exports**, not default exports.
+
+**Solution:**
+```typescript
+// Wrong - default imports
+import Table from "@tiptap/extension-table";
+import Link from "@tiptap/extension-link";
+
+// Correct - named imports
+import { Table } from "@tiptap/extension-table";
+import { Link } from "@tiptap/extension-link";
+```
+
+This applies to: Link, Image, Table, TableRow, TableCell, TableHeader, Placeholder, Underline.
+
+### Issue 2: DOMPurify in Next.js SSR
+
+**Problem:** Runtime error "DOMPurify.sanitize is not a function" when rendering HTML content.
+
+**Root Cause:** Standard `dompurify` package doesn't work with Next.js server-side rendering because it requires a DOM environment.
+
+**Solution:** Use `isomorphic-dompurify` instead:
+```bash
+npm install isomorphic-dompurify
+```
+
+```typescript
+// Wrong
+import DOMPurify from "dompurify";
+
+// Correct
+import DOMPurify from "isomorphic-dompurify";
+```
+
+### Issue 3: SSR Hydration Mismatch
+
+**Problem:** Runtime error "SSR has been detected, please set `immediatelyRender` explicitly to `false`"
+
+**Root Cause:** TipTap detects server-side rendering and requires explicit configuration to avoid hydration mismatches between server and client.
+
+**Solution:** Add `immediatelyRender: false` to the useEditor options:
+```typescript
+const editor = useEditor({
+  immediatelyRender: false,  // Required for Next.js SSR
+  extensions: [
+    StarterKit,
+    // ... other extensions
+  ],
+  content,
+  onUpdate: ({ editor }) => {
+    onChange(editor.getHTML());
+  },
+});
+```
+
+### Complete Working Setup
+
+**Dependencies:**
+```bash
+npm install @tiptap/react @tiptap/starter-kit @tiptap/pm \
+  @tiptap/extension-link @tiptap/extension-image @tiptap/extension-youtube \
+  @tiptap/extension-table @tiptap/extension-table-row @tiptap/extension-table-cell \
+  @tiptap/extension-table-header @tiptap/extension-placeholder @tiptap/extension-underline \
+  isomorphic-dompurify @tailwindcss/typography
+```
+
+**Key Configuration Points:**
+1. Use named imports for all TipTap extensions
+2. Use `isomorphic-dompurify` for HTML sanitization
+3. Set `immediatelyRender: false` in useEditor
+4. Add `"use client"` directive to editor components
+5. Add `@plugin "@tailwindcss/typography"` to globals.css for prose styles
+
+**Related Files:**
+- `src/components/admin/TipTapEditor.tsx` - WYSIWYG editor component
+- `src/components/HtmlContent.tsx` - HTML renderer with sanitization
+- `src/lib/html.ts` - HTML utilities (stripHtml, createExcerpt)
+
+---
