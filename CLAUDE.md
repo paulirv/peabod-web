@@ -85,6 +85,16 @@ Apply schema:
 wrangler d1 execute peabod-db --file=./schema.sql
 ```
 
+## Git Workflow
+
+Follow the workflow documented in `docs/GIT-WORKFLOW.md`.
+
+**Key points:**
+- Use conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`, `perf:`, `test:`, `chore:`
+- Branch naming: `feature/*`, `fix/*`, `refactor/*`, `docs/*`
+- Do NOT include `Co-Authored-By` lines in commit messages
+- Keep subject lines under 72 characters, use imperative mood
+
 ## Troubleshooting
 
 Check `docs/LESSONS-LEARNED.md` for documented solutions to past problems.
